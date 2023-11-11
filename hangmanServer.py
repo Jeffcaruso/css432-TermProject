@@ -29,6 +29,7 @@ class hangmanServer:
 
     def server(self):
         while(True):
+            
             #check for new client
             newClientID = self.net.pollForNewClientConnection()
             
@@ -40,18 +41,22 @@ class hangmanServer:
             for clientID in self.clientIDToUsername:
                 newRequest = self.net.pollClientForRequest(clientID)
                 newRequestMethodType = newRequest["Method Type"]
-
-                match newRequestMethodType:
-                    case "REGI":
-                        self.__processRegister(clientID, newRequest)
+                self.__processRegister(clientID, newRequest)
+                # match newRequestMethodType:
+                #    case "REGI":
+                #        self.__processRegister(clientID, newRequest)
         #end server
 
 
   #end hangmanServer
 
 def main():
+    print("Hello World!")
     args = sys.argv[1:]
     serverPort = args[0]
     server = hangmanServer(serverPort)
+    print("Hello World!")
     server.server()
     #endmain
+    
+main()

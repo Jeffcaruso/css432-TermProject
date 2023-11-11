@@ -197,44 +197,45 @@ class HOAStryngS:
         
         packet = packet[12:] #[12,end]
         # call appropriate parser to parse packet return whatever the parser returns)
-        match methodType:
-            case "REGI":
-                return self.__parseRegisterPacket(packet)
+        return self.__parseRegisterPacket(packet)
+        # match methodType:
+        #     case "REGI":
+        #         return self.__parseRegisterPacket(packet)
         
-            case "LIST":
-                return self.__parseListGames(packet)
+        #     case "LIST":
+        #         return self.__parseListGames(packet)
         
-            case "CREA":
-                return self.__parseCreateGame(packet)
+        #     case "CREA":
+        #         return self.__parseCreateGame(packet)
             
-            case "JOIN":
-                return self.__parseJoinGame(packet)
+        #     case "JOIN":
+        #         return self.__parseJoinGame(packet)
 
-            case "EXIT":
-                return self.__parseExitGame(packet)
+        #     case "EXIT":
+        #         return self.__parseExitGame(packet)
 
-            case "UNRG":
-                return self.__parseUnregister(packet)
+        #     case "UNRG":
+        #         return self.__parseUnregister(packet)
 
-            case "GUEL":
-                return self.__parseGuessLetter(packet)
+        #     case "GUEL":
+        #         return self.__parseGuessLetter(packet)
             
-            case "GUEW": ##optional
-                return self.__parseGuessWord(packet)
+        #     case "GUEW": ##optional
+        #         return self.__parseGuessWord(packet)
 
-            case "SLWD": 
-                return self.__parseSelectWord(packet)
+        #     case "SLWD": 
+        #         return self.__parseSelectWord(packet)
 
-            case "AKGS": 
-                return self.__parseAskGameState(packet)
+        #     case "AKGS": 
+        #         return self.__parseAskGameState(packet)
                 
-            case "GTSB": ##optional
-                return self.__parseSendScoreBoard(packet)
+        #     case "GTSB": ##optional
+        #         return self.__parseSendScoreBoard(packet)
             
-            case _:
-                # error, invalid method type
-                # NOTE: send a NACK of some kind
-                self.__sendToSocket((self.PROTOCOL_HEADER + "40 " + "Invalid Method Type\n" + self.DELIM))
+        #     case _:
+        #         # error, invalid method type
+        #         # NOTE: send a NACK of some kind
+        #         self.__sendToSocket((self.PROTOCOL_HEADER + "40 " + "Invalid Method Type\n" + self.DELIM))
         #end of pollClientForRequest
 
 

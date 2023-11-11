@@ -37,3 +37,5 @@ def main():
     client = hangmanClient(serverName, serverPort)
     client()
     #end main  
+    
+main()
