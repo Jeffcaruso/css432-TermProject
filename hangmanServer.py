@@ -11,9 +11,21 @@ class hangmanServer:
     def __init__(self, serverPort):
         self.net = HOAStryngS(serverPort)
         self.clientIDToUsername = dict()
-
-        print("test")
         #end init
+
+    def __processRegister(self, clientID, RegisterRequest):
+        username = RegisterRequest["username"]
+        # print for now - to check that everything is working
+        print(username)
+        # check if username is valid
+
+        #### MORE HANDLING HERE LATER..................................................
+        
+        # assign username to clientID
+        self.clientIDToUsername[clientID] = username
+        #end __processRegister
+
+    #more process requests methods here...
 
     def server(self):
         while(True):
@@ -31,6 +43,7 @@ class hangmanServer:
 
                 match newRequestMethodType:
                     case "REGI":
+                        self.__processRegister(clientID, newRequest)
         #end server
 
 

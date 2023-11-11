@@ -8,11 +8,11 @@ class HOAStryngC:
 
     # funtions
 
-    def __init__(self, portNumber, hostName):
-        self.__prepSocket(portNumber, hostName)
+    def __init__(self, hostName, portNumber):
+        self.__prepSocket(hostName, portNumber)
 
     # set up socket 
-    def __prepSocket(self, portNumber, hostName):
+    def __prepSocket(self, hostName, portNumber):
         self.clientSocket = socket(AF_INET, SOCK_STREAM)
         self.clientSocket.connect((hostName, portNumber))        
         # end of prepSocket
