@@ -45,24 +45,32 @@ class HOAStryngC:
     # register
     def register(self, hostName, portNumber, username):
         # build the packet using our protocol 
-        packet = self.PROTOCOL_HEADER + "REGI" + username + self.DELIM
+        packet = self.PROTOCOL_HEADER + "REGI\n" + username + self.DELIM
         # send the packet
         self.__sendToSocket(packet)
         # read response from server
         response = self.__recieveFromSocket()
 
-        # first 8 bytes are protocol header
+        # first space is the end of the protocol header
+        hdr = response.split(" ", 1)
+        
+        # next space is the end of the statusCode
+        # get status code
+        statC = hdr[1].split(" ",1)
 
-        # next two bytes are register status
-        status = response[8:10]##[8,10) 
+        # then new line is the end of the status message
+        statusMsg = statC[1].split("\n")
 
-        # anything after that and before the delimiter is error message
-        if status == "OK":
-            print(test)
+        # shouldn't need this data in this case
+        #dataAndDelim = statusMsg[1]
+        #data = dataAndDelim[1].split(self.DELIM)
 
-        return (registrationStatus, reponseCode)
-
-        # return bool for success or failure?
+        # return a dict with "StatusCode": statC, and "StatusMessage: statusMsg"
+        returnDict = {
+            "Status Code" : statC[0],
+            "Status Message" : statusMsg[0]
+        }
+        return returnDict
         # end of register
 
     # request list of games

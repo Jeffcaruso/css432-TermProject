@@ -70,9 +70,23 @@ class HOAStryngS:
 
     # methods to parse the different kinds of requests
     def __parseRegisterPacket(self, packet):
-        print("delete this later")
-        # return tuple with first value being method type, and the rest being the parameters 
-        # that the client sent with that method. 
+        #Protocol_header + method_type + "\n" + requestData + delim
+        
+        # first space is the end of the protocol header
+        hdr = packet.split(" ", 1)
+        
+        # next \n is the end of the statusCode
+        # get status code
+        methodType = hdr[1].split("\n",1)
+
+        # then delim is the end of the username
+        username = methodType[1].split(self.DELIM)
+
+        returnDict = {
+            "Method Type" : methodType,
+            "Username" : username
+        }
+        return returnDict
         # end __parseRegisterPacket
     
     def __parseListGames(self, packet):
@@ -220,14 +234,14 @@ class HOAStryngS:
             case _:
                 # error, invalid method type
                 # NOTE: send a NACK of some kind
-                self.__sendToSocket((self.PROTOCOL_HEADER + "NAK" + self.DELIM))
+                self.__sendToSocket((self.PROTOCOL_HEADER + "40 " + "Invalid Method Type\n" + self.DELIM))
         #end of pollClientForRequest
 
 
     # send ACK for register (or NACK) 
     # registrationStatus is either OK or NO
-    def sendRegistrationStatus(self, clientID, registrationStatus, errorMessage=""):
-        packet = self.PROTOCOL_HEADER + registrationStatus + errorMessage + self.DELIM
+    def sendRegistrationStatus(self, clientID, statusCode: str, statusMessage="OK"):
+        packet = self.PROTOCOL_HEADER + statusCode + " " + statusMessage + "\n" + self.DELIM
         self.__sendToSocket(clientID, packet)
         # end sendRegistrationStatus
 
