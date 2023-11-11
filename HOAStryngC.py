@@ -20,7 +20,7 @@ class HOAStryngC:
 
     # send though server socket
     def __sendToSocket(self, packet):
-        self.clientSocket.send(packet)
+        self.clientSocket.send(packet.encode())
         #end of sendToSocket
 
 
@@ -37,13 +37,13 @@ class HOAStryngC:
         # before issuing another request 
         while packet.find(self.DELIM) == -1:  
             bytePacket = self.clientSocket.recv(1024)
-            packet += bytePacket.decode
+            packet += bytePacket.decode()
 
         return packet
         #end of recieveFromSocket
 
     # register
-    def register(self, hostName, portNumber, username):
+    def register(self, username):
         # build the packet using our protocol 
         packet = self.PROTOCOL_HEADER + "REGI\n" + username + self.DELIM
         # send the packet

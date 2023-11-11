@@ -31,16 +31,17 @@ class HOAStryngS:
 
 
     # prep listener
-    def __prepListener(self, serverPort):
+    def __prepListener(self, serverPort: int):
         self.serverListenerSock = socket(AF_INET, SOCK_STREAM)
         self.serverListenerSock.bind(('', serverPort))
-        self.serverListenerSock.setblocking(0)
+        #self.serverListenerSock.setblocking(0)
+        self.serverListenerSock.listen(1)
         #end prepListener
 
 
     def __sendToSocket(self, clientID, packet):
         # send the packet to the proper client connection
-        self.activeClientConnections[clientID].send(packet)      
+        self.activeClientConnections[clientID].send(packet.encode())      
         #end of sendToSocket
 
 
@@ -52,7 +53,7 @@ class HOAStryngS:
         packet = connectionSocket.recv(1024).decode()
 
         # if connection didnt send anything return none
-        if packet.size() == 0:
+        if len(packet) == 0:
             return None
 
         # while we have yet to get the end of the packet
@@ -77,7 +78,7 @@ class HOAStryngS:
         
         # next \n is the end of the statusCode
         # get status code
-        methodType = hdr[1].split("\n",1)
+        methodType = hdr[1].split("\n", 1)
 
         # then delim is the end of the username
         username = methodType[1].split(self.DELIM)
@@ -193,11 +194,16 @@ class HOAStryngS:
         
         # first 8 Bytes is the PROTOCOL_HEADER
         # find the next 4 bytes of the packet determine the method type
-        methodType = packet[8 : 12] #[8,11]
-        
-        packet = packet[12:] #[12,end]
+        #methodType = packet[8 : 12] #[8,11]
+        hdr = packet.split(" ", 1)
+        methodType = hdr[1].split("\n",1)
+
+        #methodType[0] is method Type
+
+
         # call appropriate parser to parse packet return whatever the parser returns)
         return self.__parseRegisterPacket(packet)
+        
         # match methodType:
         #     case "REGI":
         #         return self.__parseRegisterPacket(packet)

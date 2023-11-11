@@ -1,17 +1,15 @@
 import sys
-import HOAStryngC
+from HOAStryngC import HOAStryngC
 
 
 class hangmanClient:
 
     def __init__(self, serverName, serverPort):
         
-        net = HOAStryngC(serverName, serverPort)
+        self.net = HOAStryngC(serverName, serverPort)
         #end init
 
         
-
-
     def client(self):
         # Register
         response = self.net.register("this is a great username")
@@ -26,16 +24,13 @@ class hangmanClient:
 
 
 
-
-
-
 def main():
     args = sys.argv[1:]
     serverName = args[0]
-    serverPort = args[1]
+    serverPort = int(args[1])
 
     client = hangmanClient(serverName, serverPort)
-    client()
+    client.client()
     #end main  
     
 main()

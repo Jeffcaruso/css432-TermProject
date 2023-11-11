@@ -1,5 +1,5 @@
 import sys
-import HOAStryngS
+from HOAStryngS import HOAStryngS
 
 # will check for a new client connection
 # will loop through client IDs
@@ -14,7 +14,7 @@ class hangmanServer:
         #end init
 
     def __processRegister(self, clientID, RegisterRequest):
-        username = RegisterRequest["username"]
+        username = RegisterRequest["Username"]
         # print for now - to check that everything is working
         print(username)
         # check if username is valid
@@ -51,11 +51,9 @@ class hangmanServer:
   #end hangmanServer
 
 def main():
-    print("Hello World!")
     args = sys.argv[1:]
-    serverPort = args[0]
+    serverPort = int(args[0])
     server = hangmanServer(serverPort)
-    print("Hello World!")
     server.server()
     #endmain
     
