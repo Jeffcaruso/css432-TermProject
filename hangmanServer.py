@@ -28,8 +28,13 @@ class hangmanServer:
         #end __processRegister
 
 
-    def __processList(self, clientID, RegisterRequest):
-        print(clientID)
+    def __processList(self, clientID):
+
+
+
+
+
+        self.net.sendGameList()
         #end __processList
     
     def __processCreate(self, clientID, RegisterRequest):
@@ -59,6 +64,8 @@ class hangmanServer:
     def __processInitGuesser(self, clientID, RegisterRequest):
         print(clientID)
         #end __processList
+
+    # NOTE: update game state to be the three seperate methods -------------------------
 
     def __processAskGameState(self, clientID, RegisterRequest):
         print(clientID)

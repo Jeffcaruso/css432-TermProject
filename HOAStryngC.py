@@ -76,10 +76,33 @@ class HOAStryngC:
     # request list of games
     def requestGamesList(self):
         # build the packet using our protocol 
-        print("delete this later")
+        packet = self.PROTOCOL_HEADER + "LIST\n" + self.DELIM
         # send the packet
+        self.__sendToSocket(packet)
+        # read response from server
+        response = self.__recieveFromSocket()
+
+        # first space is the end of the protocol header
+        hdr = response.split(" ", 1)
         
-        # return list of games
+        # next space is the end of the statusCode
+        # get status code
+        statC = hdr[1].split(" ",1)
+
+        # then new line is the end of the status message
+        statusMsg = statC[1].split("\n")
+
+        # get data 
+        dataAndDelim = statusMsg[1]
+        data = dataAndDelim[1].split(self.DELIM)
+
+        # return a dict with "StatusCode": statC, and "StatusMessage: statusMsg"
+        returnDict = {
+            "Status Code" : statC[0],
+            "Status Message" : statusMsg[0],
+            "Game List:" : data
+        }
+        return returnDict
         # end of requestGamesList
 
     # create a new game

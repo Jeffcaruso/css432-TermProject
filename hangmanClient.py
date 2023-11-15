@@ -5,7 +5,6 @@ from HOAStryngC import HOAStryngC
 class hangmanClient:
 
     def __init__(self, serverName, serverPort):
-        
         self.net = HOAStryngC(serverName, serverPort)
         #end init
 

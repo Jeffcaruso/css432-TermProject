@@ -91,7 +91,19 @@ class HOAStryngS:
         # end __parseRegisterPacket
     
     def __parseListGames(self, packet):
-       print("delete this later")
+        #Protocol_header + method_type + "\n" + requestData + delim
+        
+        # first space is the end of the protocol header
+        hdr = packet.split(" ", 1)
+        
+        # next \n is the end of the statusCode
+        # get status code
+        methodType = hdr[1].split("\n", 1)
+
+        returnDict = {
+            "Method Type" : methodType[0]
+        }
+        return returnDict
        # end __parseListGames
 
 
@@ -136,7 +148,7 @@ class HOAStryngS:
         print("delete this later")
         #end __parseInitGuesser
 
-
+    # NOTE: update game state to be the three seperate methods -------------------------
 
     def __parseAskGameState(self, packet):
         print("delete this later")
@@ -245,15 +257,16 @@ class HOAStryngS:
 
     # send ACK for register (or NACK) 
     # registrationStatus is either OK or NO
-    def sendRegistrationStatus(self, clientID, statusCode: str, statusMessage="OK"):
+    def sendRegistrationStatus(self, clientID, statusCode: str, statusMessage):
         packet = self.PROTOCOL_HEADER + statusCode + " " + statusMessage + "\n" + self.DELIM
         self.__sendToSocket(clientID, packet)
         # end sendRegistrationStatus
 
 
     # send game list
-    def sendGameList(self, clientID, gameList):
-        print("delete this later")
+    def sendGameList(self, clientID,  statusCode: str, statusMessage, gameList):
+        packet = self.PROTOCOL_HEADER + statusCode + " " + statusMessage + "\n" + gameList + self.DELIM
+        self.__sendToSocket(clientID, packet)
         # end sendGameList
 
 
@@ -289,6 +302,7 @@ class HOAStryngS:
     # # initialize guesser (send initial word)
     # def initGuesser() # use sendUpdatedGameData
 
+    # NOTE: update game state to be the three seperate methods -------------------------
 
     # send game state (win,loss,InProgress,OtherPlayerQuit, points)
     def sendGameState(self, clientID, WoL, inProgress, points):
