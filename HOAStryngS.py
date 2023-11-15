@@ -33,8 +33,8 @@ class HOAStryngS:
     # prep listener
     def __prepListener(self, serverPort: int):
         self.serverListenerSock = socket(AF_INET, SOCK_STREAM)
+        self.serverListenerSock.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
         self.serverListenerSock.bind(('', serverPort))
-        #self.serverListenerSock.setblocking(0)
         self.serverListenerSock.listen(1)
         #end prepListener
 
@@ -84,8 +84,8 @@ class HOAStryngS:
         username = methodType[1].split(self.DELIM)
 
         returnDict = {
-            "Method Type" : methodType,
-            "Username" : username
+            "Method Type" : methodType[0],
+            "Username" : username[0]
         }
         return returnDict
         # end __parseRegisterPacket
@@ -165,19 +165,22 @@ class HOAStryngS:
     # non-blocking accept on the lister Socket
     # return the new clientID or -1 if no new clients were found
     def pollForNewClientConnection(self):
-        # accept from the Listener (which was set to non blocking)
-        connectionSocket, clientAddress = self.serverListenerSock.accept()
+        # check if the listener socket has anything to read
+        read_list = [self.serverListenerSock]
+        readable, writable, errored = select.select(read_list, [], [])
 
-        # if we recieved a connection request
-        # add generate unique ID and add connection to list of active clients
-        if connectionSocket is not None:
-            clientID = self.__getNewClientID()
-            # set connection to be non-blocking so we can poll 
-            connectionSocket.setblocking(0)
-            self.activeClientConnections[clientID] = connectionSocket
-            return clientID
-        else:
-            return -1
+        # if socket does have something to read, accept a new client connection
+        for s in readable:
+            if s is self.serverListenerSock:
+                connectionSocket, clientAddress = self.serverListenerSock.accept()
+                # set connection to be non-blocking so we can poll 
+                connectionSocket.setblocking(0)
+                 # add generate unique ID and add connection to list of active clients
+                clientID = self.__getNewClientID()
+                self.activeClientConnections[clientID] = connectionSocket
+                return clientID
+        # if socket does not have something to read, return -1  
+        return -1
         #end of pollForNewClientConnection
 
 
@@ -200,48 +203,43 @@ class HOAStryngS:
 
         #methodType[0] is method Type
 
-
         # call appropriate parser to parse packet return whatever the parser returns)
-        return self.__parseRegisterPacket(packet)
+        if(methodType[0] == "REGI"):
+            return self.__parseRegisterPacket(packet)
         
-        # match methodType:
-        #     case "REGI":
-        #         return self.__parseRegisterPacket(packet)
+        elif(methodType[0] == "LIST"):
+            return self.__parseListGames(packet)
         
-        #     case "LIST":
-        #         return self.__parseListGames(packet)
+        elif(methodType[0] == "CREA"):
+            return self.__parseCreateGame(packet)
         
-        #     case "CREA":
-        #         return self.__parseCreateGame(packet)
-            
-        #     case "JOIN":
-        #         return self.__parseJoinGame(packet)
+        elif(methodType[0] == "JOIN"):
+            return self.__parseJoinGame(packet)
+        
+        elif(methodType[0] == "EXIT"):
+            return self.__parseExitGame(packet)
+        
+        elif(methodType[0] == "UNRG"):
+            return self.__parseUnregister(packet)
+        
+        elif(methodType[0] == "GUEL"):
+            return self.__parseGuessLetter(packet)
 
-        #     case "EXIT":
-        #         return self.__parseExitGame(packet)
+        elif(methodType[0] == "GUEW"): ##optional
+            return self.__parseGuessWord(packet)
 
-        #     case "UNRG":
-        #         return self.__parseUnregister(packet)
+        elif(methodType[0] == "SLWD"):
+            return self.__parseSelectWord(packet)
+        
+        elif(methodType[0] == "AKGS"):
+            return self.__parseAskGameState(packet)
+        
+        elif(methodType[0] ==  "GTSB"): ##optional
+            return self.__parseSendScoreBoard(packet)
 
-        #     case "GUEL":
-        #         return self.__parseGuessLetter(packet)
-            
-        #     case "GUEW": ##optional
-        #         return self.__parseGuessWord(packet)
-
-        #     case "SLWD": 
-        #         return self.__parseSelectWord(packet)
-
-        #     case "AKGS": 
-        #         return self.__parseAskGameState(packet)
-                
-        #     case "GTSB": ##optional
-        #         return self.__parseSendScoreBoard(packet)
-            
-        #     case _:
-        #         # error, invalid method type
-        #         # NOTE: send a NACK of some kind
-        #         self.__sendToSocket((self.PROTOCOL_HEADER + "40 " + "Invalid Method Type\n" + self.DELIM))
+        else:
+           self.__sendToSocket((self.PROTOCOL_HEADER + "40 " + "Invalid Method Type\n" + self.DELIM))
+           return None; 
         #end of pollClientForRequest
 
 
@@ -252,15 +250,18 @@ class HOAStryngS:
         self.__sendToSocket(clientID, packet)
         # end sendRegistrationStatus
 
+
     # send game list
     def sendGameList(self, clientID, gameList):
         print("delete this later")
         # end sendGameList
 
+
     # send game id to ACK create/join game + who starts first 
     def sendGameInfoInit(self, clientID, intialGameState):
         print("delete this later")
         # end sendGameInfoInit
+
 
     # # send ACK for leaving game - Probably dont need these
     # def sendGameExit():
