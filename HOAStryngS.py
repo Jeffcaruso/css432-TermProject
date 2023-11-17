@@ -85,7 +85,7 @@ class HOAStryngS:
 
         returnDict = {
             "Method Type" : methodType[0],
-            "Username" : username[0]
+            "Data" : username[0]
         }
         return returnDict
         # end __parseRegisterPacket
@@ -148,11 +148,20 @@ class HOAStryngS:
         print("delete this later")
         #end __parseInitGuesser
 
-    # NOTE: update game state to be the three seperate methods -------------------------
 
     def __parseAskGameState(self, packet):
         print("delete this later")
         #end __parseInitGuesser
+
+
+    def __parseAskMyPoints(self, packet):
+        print("delete this later")
+        #end __parseAskMyPoints
+
+
+    def __parseAskOpponentPoints(self, packet):
+        print("delete this later")
+        #end __parseAskOpponentPoints
 
 
     def __parseSendScoreBoard(self, packet):
@@ -302,12 +311,22 @@ class HOAStryngS:
     # # initialize guesser (send initial word)
     # def initGuesser() # use sendUpdatedGameData
 
-    # NOTE: update game state to be the three seperate methods -------------------------
 
-    # send game state (win,loss,InProgress,OtherPlayerQuit, points)
-    def sendGameState(self, clientID, WoL, inProgress, points):
+    # send game state (win,loss, gamestate)
+    def sendGameState(self, clientID, gameState):
         print("delete this later")
         #end sendGameState
+
+
+    def sendYourPoints(self, clientID, points):
+        print("delete this later")
+        #end sendYourPoints
+
+
+    def sendOpponentPoints(self, clientID, points):
+        print("delete this later")
+        #end sendOpponentPoints
+
 
     # send scoreboard
     def sendScoreboard(self, clientID, scoreboard):

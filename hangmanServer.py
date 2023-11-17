@@ -13,7 +13,7 @@ class hangmanServer:
         #end init
 
     def __processRegister(self, clientID, RegisterRequest):
-        username = RegisterRequest["Username"]
+        username = RegisterRequest["Data"]
         # print for now - to check that everything is working
         print(username)
         # check if username is valid
@@ -124,6 +124,9 @@ class hangmanServer:
 
                 elif(newRequestMethodType == "AKGS"):
                     self.__processAskGameState(clientID, newRequest)
+
+                elif(newRequestMethodType == "GMPT"):
+                    self.__processAskGameState()
 
                 elif(newRequestMethodType == "GTSB"):
                     self.__processGetScoreBoard(clientID, newRequest)
