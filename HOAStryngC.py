@@ -1,4 +1,5 @@
 from socket import *
+import json
 
 
 class HOAStryngC:
@@ -38,6 +39,7 @@ class HOAStryngC:
         while packet.find(self.DELIM) == -1:  
             bytePacket = self.clientSocket.recv(1024)
             packet += bytePacket.decode()
+            print("here HCS rfs 7")
 
         return packet
         #end of recieveFromSocket
@@ -52,20 +54,28 @@ class HOAStryngC:
         statC = hdr[1].split(" ",1)
 
         # then new line is the end of the status message
-        statusMsg = statC[1].split("\n")
+        statusMsg = statC[1].split("\n", 1)
 
         # get data 
-        dataAndDelim = statusMsg[1]
-        data = dataAndDelim[1].split(self.DELIM)
         
-        # return a dict with "StatusCode": statC, and "StatusMessage: statusMsg"
-        if len(data[0]) > 0 :
+        dataAndDelim = statusMsg[1]
+        print(dataAndDelim)
+        #data = dataAndDelim[1].split(self.DELIM, 1)
+        data = dataAndDelim.split(self.DELIM,1)
+        print("data(" + data[0] + ")")
+
+        print("here HCS" + data[0])
+        # if there was data 
+        if len(data[0]) != 0 :
+            data_loaded = json.loads(data[0])
             returnDict = {
                 "Status Code" : statC[0],
                 "Status Message" : statusMsg[0],
-                "Data" : data[0]
+                "Data" : data_loaded
             }
             return returnDict
+        
+        # if there was no data 
         else:
             returnDict = {
                 "Status Code" : statC[0],
@@ -79,11 +89,15 @@ class HOAStryngC:
     def register(self, username):
         # build the packet using our protocol 
         packet = self.PROTOCOL_HEADER + "REGI\n" + username + self.DELIM
+        print("here HCS - 3")
         # send the packet
         self.__sendToSocket(packet)
+        print("here HCS - 4")
+        
         # read response from server
         response = self.__recieveFromSocket()
-
+        print("here HCS - 5")
+        # process the returned packet and send back a return dict
         return self.processReturnedInfo(response)
         # end of register
 
@@ -96,7 +110,7 @@ class HOAStryngC:
         self.__sendToSocket(packet)
         # read response from server
         response = self.__recieveFromSocket()
-
+        # process the returned packet and send back a return dict
         return self.processReturnedInfo(response)
         # end of requestGamesList
     
@@ -109,7 +123,7 @@ class HOAStryngC:
         self.__sendToSocket(packet)
         # read response from server
         response = self.__recieveFromSocket()
-
+        # process the returned packet and send back a return dict
         return self.processReturnedInfo(response)
         # end of createNewGame
 
@@ -122,7 +136,7 @@ class HOAStryngC:
         self.__sendToSocket(packet)
         # read response from server
         response = self.__recieveFromSocket()
-
+        # process the returned packet and send back a return dict
         return self.processReturnedInfo(response)
         # end join game
 
@@ -135,7 +149,7 @@ class HOAStryngC:
         self.__sendToSocket(packet)
         # read response from server
         response = self.__recieveFromSocket()
-
+        # process the returned packet and send back a return dict
         return self.processReturnedInfo(response)
         # end exitGame
 
@@ -148,7 +162,7 @@ class HOAStryngC:
         self.__sendToSocket(packet)
         # read response from server
         response = self.__recieveFromSocket()
-
+        # process the returned packet and send back a return dict
         return self.processReturnedInfo(response)
         # end unregister
 
@@ -161,7 +175,7 @@ class HOAStryngC:
         self.__sendToSocket(packet)
         # read response from server
         response = self.__recieveFromSocket()
-
+        # process the returned packet and send back a return dict
         return self.processReturnedInfo(response)
         # end guessLetter
 
@@ -171,9 +185,6 @@ class HOAStryngC:
     def __guessWord(self, guessedWord):
         # build the packet using our protocol 
         print("delete this later")
-        # send the packet
-
-        # return new word state (if the guess was correct or not) 
         #end guessWord
 
 
@@ -185,7 +196,7 @@ class HOAStryngC:
         self.__sendToSocket(packet)
         # read response from server
         response = self.__recieveFromSocket()
-
+        # process the returned packet and send back a return dict
         return self.processReturnedInfo(response)
         
         #end selectWord
@@ -217,6 +228,7 @@ class HOAStryngC:
         #end askGameState
 
 
+    # get my points
     def getMyPoints(self):
         # build the packet using our protocol 
         packet = self.PROTOCOL_HEADER + "GMPT\n" + self.DELIM
@@ -224,12 +236,12 @@ class HOAStryngC:
         self.__sendToSocket(packet)
         # read response from server
         response = self.__recieveFromSocket()
-
+        # process the returned packet and send back a return dict
         return self.processReturnedInfo(response)
-
         #end getMyPoints
 
 
+    # get opponent's points
     def getOpponentPoints(self):
         # build the packet using our protocol 
         packet = self.PROTOCOL_HEADER + "GOPT\n" + self.DELIM

@@ -29,12 +29,11 @@ class hangmanServer:
 
 
     def __processList(self, clientID):
+        print("got to processList")
 
+        gameList = {1 : "usernameA",  2 : "usernameB" } 
 
-
-
-
-        self.net.sendGameList()
+        self.net.sendGameList(clientID, "20", "OK", gameList)
         #end __processList
     
     def __processCreate(self, clientID, RegisterRequest):
@@ -65,11 +64,17 @@ class hangmanServer:
         print(clientID)
         #end __processList
 
-    # NOTE: update game state to be the three seperate methods -------------------------
-
     def __processAskGameState(self, clientID, RegisterRequest):
         print(clientID)
         #end __processList
+
+    def __processGetMyPoints(self, clientID, RegisterRequest):
+        print(clientID)
+        #end __GetMyPoints
+
+    def __processGetOpponentPoints(self, clientID, RegisterRequest):
+        print(clientID)
+        #end __GetOpponentPoints
 
     def __processGetScoreBoard(self, clientID, RegisterRequest):
         print(clientID)
@@ -80,7 +85,9 @@ class hangmanServer:
 
     def server(self):
         while(True):
-            
+
+            print("here HS - 2")
+
             #check for new client
             newClientID = self.net.pollForNewClientConnection()
             
@@ -88,17 +95,26 @@ class hangmanServer:
             if(newClientID != -1):  ##is not None):
                 self.clientIDToUsername[newClientID] = "" 
 
+            print("here HS - 5")
+
             #poll each of the clients to see if they have sent a request
             for clientID in self.clientIDToUsername:
+
+                print("here HS - 7")
                 newRequest = self.net.pollClientForRequest(clientID)
+                if newRequest is None:
+                    #skip
+                    continue
+                
                 newRequestMethodType = newRequest["Method Type"]
+
 
                 # call the approperiate processing helper method
                 if(newRequestMethodType == "REGI"):
                     self.__processRegister(clientID, newRequest)
 
                 elif(newRequestMethodType == "LIST"):
-                    self.__processList(clientID, newRequest)
+                    self.__processList(clientID)
 
                 elif(newRequestMethodType == "CREA"):
                     self.__processCreate(clientID, newRequest)
@@ -126,7 +142,10 @@ class hangmanServer:
                     self.__processAskGameState(clientID, newRequest)
 
                 elif(newRequestMethodType == "GMPT"):
-                    self.__processAskGameState()
+                    self.__processGetMyPoints()
+                
+                elif(newRequestMethodType == "GOPT"):
+                    self.__processGetOpponentPoints()
 
                 elif(newRequestMethodType == "GTSB"):
                     self.__processGetScoreBoard(clientID, newRequest)

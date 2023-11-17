@@ -1,27 +1,14 @@
 from socket import *
 import select
 import random
+import json
 
-    #     addr = ("", 8080)  # all interfaces, port 8080
-    # if socket.has_dualstack_ipv6():
-    #     s = socket.create_server(addr, family=socket.AF_INET6, dualstack_ipv6=True)
-    # else:
-    #     s = socket.create_server(addr)
-
-
-# # connection class
-# class ClientConnection:
-#     def __init__(self, ):
-#         self.connectionSocket
-
-
-#     # end ClientConnection
-  
 
 
 class HOAStryngS:
     DELIM = "~~~~~~()"
     PROTOCOL_HEADER = "HOAS/1.0 "
+    ACCEPTED_METHOD_TYPES = {"REGI", "LIST", "CREA", "JOIN", "EXIT", "UNRG", "GUEL", "SLWD", "INIG", "AKGS", "GTMP", "GOPT", "GTSB" }
 
 
     def __init__(self, serverPort):
@@ -69,8 +56,7 @@ class HOAStryngS:
         #end of __nonBlockingRecieveFrom
 
 
-    # methods to parse the different kinds of requests
-    def __parseRegisterPacket(self, packet):
+    def __parseRequestPacket(self, packet):
         #Protocol_header + method_type + "\n" + requestData + delim
         
         # first space is the end of the protocol header
@@ -80,93 +66,20 @@ class HOAStryngS:
         # get status code
         methodType = hdr[1].split("\n", 1)
 
-        # then delim is the end of the username
-        username = methodType[1].split(self.DELIM)
-
-        returnDict = {
-            "Method Type" : methodType[0],
-            "Data" : username[0]
-        }
-        return returnDict
-        # end __parseRegisterPacket
-    
-    def __parseListGames(self, packet):
-        #Protocol_header + method_type + "\n" + requestData + delim
-        
-        # first space is the end of the protocol header
-        hdr = packet.split(" ", 1)
-        
-        # next \n is the end of the statusCode
-        # get status code
-        methodType = hdr[1].split("\n", 1)
-
-        returnDict = {
-            "Method Type" : methodType[0]
-        }
-        return returnDict
-       # end __parseListGames
-
-
-    def __parseCreateGame(self, packet):
-        print("delete this later")
-        # end __parseCreateGame
-      
-
-    def __parseJoinGame(self, packet):
-        print("delete this later")
-        # end __parseJoinGame
-
-
-    def __parseExitGame(self, packet):
-        print("delete this later")
-        # end __parseExitGame
-
-
-    def __parseUnregister(self, packet):
-        print("delete this later")
-        # end __parseUnregister
-    
-
-    def __parseGuessLetter(self, packet):
-        print("delete this later")
-        # end __parseGuessLetter
-
-
-    def __parseGuessWord(self, packet):
-        print("delete this later")
-        #end __parseGuessWord
-
-
-
-    def __parseSelectWord(self, packet):
-        print("delete this later")
-        #end __parseSelectWord
-    
-
-
-    def __parseInitGuesser(self, packet):
-        print("delete this later")
-        #end __parseInitGuesser
-
-
-    def __parseAskGameState(self, packet):
-        print("delete this later")
-        #end __parseInitGuesser
-
-
-    def __parseAskMyPoints(self, packet):
-        print("delete this later")
-        #end __parseAskMyPoints
-
-
-    def __parseAskOpponentPoints(self, packet):
-        print("delete this later")
-        #end __parseAskOpponentPoints
-
-
-    def __parseSendScoreBoard(self, packet):
-        print("delete this later")
-        #end __parseSendScoreBoard
+        # then delim is the end of the data
+        data = methodType[1].split(self.DELIM,1)
+        if len(data[0]) > 0 :
+            returnDict = {
+                "Method Type" : methodType[0],
+                "Data" : data[0]
+            }
+            return returnDict
+        else:
+            returnDict = {
+                "Method Type" : methodType[0]
+            }
+            return returnDict
+        #end of __parseRequestPacket
     
 
     # generates a new unique four digit client ID number
@@ -187,8 +100,11 @@ class HOAStryngS:
     # return the new clientID or -1 if no new clients were found
     def pollForNewClientConnection(self):
         # check if the listener socket has anything to read
+        print("here HSS - 1")
         read_list = [self.serverListenerSock]
-        readable, writable, errored = select.select(read_list, [], [])
+        readable, writable, errored = select.select(read_list, [], [], 0.1)
+
+        print("here HSS - 3")
 
         # if socket does have something to read, accept a new client connection
         for s in readable:
@@ -203,6 +119,9 @@ class HOAStryngS:
         # if socket does not have something to read, return -1  
         return -1
         #end of pollForNewClientConnection
+        
+
+
 
 
     # poll for client request
@@ -224,43 +143,12 @@ class HOAStryngS:
 
         #methodType[0] is method Type
 
-        # call appropriate parser to parse packet return whatever the parser returns)
-        if(methodType[0] == "REGI"):
-            return self.__parseRegisterPacket(packet)
-        
-        elif(methodType[0] == "LIST"):
-            return self.__parseListGames(packet)
-        
-        elif(methodType[0] == "CREA"):
-            return self.__parseCreateGame(packet)
-        
-        elif(methodType[0] == "JOIN"):
-            return self.__parseJoinGame(packet)
-        
-        elif(methodType[0] == "EXIT"):
-            return self.__parseExitGame(packet)
-        
-        elif(methodType[0] == "UNRG"):
-            return self.__parseUnregister(packet)
-        
-        elif(methodType[0] == "GUEL"):
-            return self.__parseGuessLetter(packet)
+        if methodType[0] not in self.ACCEPTED_METHOD_TYPES:
+            self.__sendToSocket((self.PROTOCOL_HEADER + "40 " + "Invalid Method Type\n" + self.DELIM))
+            return None; 
 
-        elif(methodType[0] == "GUEW"): ##optional
-            return self.__parseGuessWord(packet)
-
-        elif(methodType[0] == "SLWD"):
-            return self.__parseSelectWord(packet)
-        
-        elif(methodType[0] == "AKGS"):
-            return self.__parseAskGameState(packet)
-        
-        elif(methodType[0] ==  "GTSB"): ##optional
-            return self.__parseSendScoreBoard(packet)
-
-        else:
-           self.__sendToSocket((self.PROTOCOL_HEADER + "40 " + "Invalid Method Type\n" + self.DELIM))
-           return None; 
+        # call parser to parse the packet 
+        return self.__parseRequestPacket(packet)
         #end of pollClientForRequest
 
 
@@ -274,7 +162,9 @@ class HOAStryngS:
 
     # send game list
     def sendGameList(self, clientID,  statusCode: str, statusMessage, gameList):
-        packet = self.PROTOCOL_HEADER + statusCode + " " + statusMessage + "\n" + gameList + self.DELIM
+
+        dataString = json.dumps(gameList)
+        packet = self.PROTOCOL_HEADER + statusCode + " " + statusMessage + "\n" + dataString + self.DELIM
         self.__sendToSocket(clientID, packet)
         # end sendGameList
 
