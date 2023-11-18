@@ -4,22 +4,22 @@ from HOAStryngC import HOAStryngC
 
 class hangmanClient:
 
-    def __init__(self, serverName, serverPort):
-        self.net = HOAStryngC(serverName, serverPort)
+    def __init__(self):
+        self.net = HOAStryngC()
         #end init
 
         
-    def client(self):
+    def client(self, serverName, serverPort):
         # Register
         print("*** Register ***")
-        response = self.net.register("this is a great username")
+        response = self.net.register(serverName, serverPort,"this is a great username")
         statusCode = response["Status Code"]
         print(statusCode)
 
         print("here HC - 5")
 
         print("*** Register ***")
-        response = self.net.register("this is a great username")
+        response = self.net.register(serverName, serverPort, "this is a great username")
         statusCode = response["Status Code"]
         print(statusCode)
 
@@ -43,6 +43,17 @@ class hangmanClient:
         print("status code: " + Info2["Status Code"])
         print("AreGuesser: " + str(Info2["Data"]["You Are Guesser"]))
 
+        Info3 = self.net.exitGame()
+        print("exit Game:")
+        print("status code: " + Info3["Status Code"])
+
+
+        Info4 = self.net.unregister()
+        print("unregister:")
+        print("Status code: " + Info4["Status Code"])
+        
+
+
 
     
     #end hangman client
@@ -54,8 +65,8 @@ def main():
     serverName = args[0]
     serverPort = int(args[1])
 
-    client = hangmanClient(serverName, serverPort)
-    client.client()
+    client = hangmanClient()
+    client.client(serverName, serverPort)
     #end main  
     
 main()

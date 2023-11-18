@@ -36,7 +36,26 @@ class HOAStryngS:
     # returns the packet read, or none if the connection
     # has not sent anything to this socket
     def __nonBlockingRecieveFrom(self, connectionSocket):
+        # # check if the connectionSocket has anything to read
+        # read_list = [connectionSocket]
+        # readable, writable, errored = select.select(read_list, [], [], 0.1)
+
+        # # if socket does have something to read, accept a new client connection
+        # for s in readable:
+        #     if s is connectionSocket:
+        #         packet = connectionSocket.recv(1024).decode()
+        #         if len(packet) > 0:
+        #             while packet.find(self.DELIM) == -1:
+        #                 packet += connectionSocket.recv(1024).decode()
+        #                 return packet
+                    
+        # return None
+        
+        
+        
+        ### old method below for this FN
         # the connectionSocket was set to non-blocking earlier
+        connectionSocket.setblocking(0)
         packet = connectionSocket.recv(1024).decode()
 
         # if connection didnt send anything return none
@@ -52,6 +71,7 @@ class HOAStryngS:
         while packet.find(self.DELIM) == -1:
             packet += connectionSocket.recv(1024).decode()
 
+        connectionSocket.setblocking(1)
         return packet
         #end of __nonBlockingRecieveFrom
 
@@ -100,19 +120,16 @@ class HOAStryngS:
     # return the new clientID or -1 if no new clients were found
     def pollForNewClientConnection(self):
         # check if the listener socket has anything to read
-        print("here HSS - 1")
         read_list = [self.serverListenerSock]
         readable, writable, errored = select.select(read_list, [], [], 0.1)
-
-        print("here HSS - 3")
 
         # if socket does have something to read, accept a new client connection
         for s in readable:
             if s is self.serverListenerSock:
                 connectionSocket, clientAddress = self.serverListenerSock.accept()
                 # set connection to be non-blocking so we can poll 
-                connectionSocket.setblocking(0)
-                 # add generate unique ID and add connection to list of active clients
+                # connectionSocket.setblocking(0)
+                # add generate unique ID and add connection to list of active clients
                 clientID = self.__getNewClientID()
                 self.activeClientConnections[clientID] = connectionSocket
                 return clientID
@@ -157,21 +174,13 @@ class HOAStryngS:
             packet = self.PROTOCOL_HEADER + statusCode + " " + statusMessage + "\n" + self.DELIM
         self.__sendToSocket(clientID, packet)
         #end of sendDataToClient
+
+
+    def removeClient(self, clientID):
+        self.activeClientConnections[clientID].close()
+        del self.activeClientConnections[clientID]
+        #end removeClient
+
+
         
     #end HOAStryngS
-
-
-    
-
-
-
-
-
-
-
-
-
-
-
-
-    

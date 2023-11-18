@@ -1,14 +1,19 @@
+init
 *** Register ***
-20
+41
 here HC - 5
 *** Register ***
-20
+41
 *** List Games ***
 20
 dict_items([('1', 'usernameA'), ('2', 'usernameB')])
 Create Game:
-GameID: 8744
-AreGuesser: True
+GameID: 2387
+AreGuesser: False
 Join Game:
 status code: 20
-AreGuesser: False
+AreGuesser: True
+exit Game:
+status code: 20
+unregister:
+Status code: 20

@@ -20,28 +20,32 @@ class game:
     
 
     # round status methods...
+    #startNewRound() 
+
+
+    # round status methods
     #roundWon() # word found
     #roundLost() # hangman fullly displayed
     #roundInProgress()
-    #getNumPlayers()
 
+    # word status methods 
     def getWord(self):
         return self.word
         #end getWord
 
     def getCensoredWord(self):
         return self.censoredWord
-
-    #startNewRound() 
+        #end getCensoredWord
     
 
-    def getGuesser(self):
-        return self.guesser
-        #end getGuesser 
+    # get player status method
+    def getNumPlayers(self):
+        return len(self.clientIDtoScore.keys())
+        #end getNumPlayers
 
 
     def gameIsFull(self): 
-        return len(self.clientIDtoScore.keys()) >= 2
+        return self.getNumPlayers() >= 2
         #end gameIsFull
 
 
@@ -56,17 +60,22 @@ class game:
 
 
     def removePlayer(self, clientID):
-        if len(self.clientIDtoScore.keys()) == 0:
-            return False
-        
-        if clientID in self.clientIDtoScore.keys():
+        if clientID not in self.clientIDtoScore.keys():
             return False
         
         del self.clientIDtoScore[clientID]
         return True
-        #end player 
+        #end removePlayer 
 
 
+    def getGuesser(self):
+        return self.guesser
+        #end getGuesser 
+
+    
+    def setGuesser(self, clientID):
+        self.guesser = clientID
+        #end setGuesser
 
 
     #end of game class

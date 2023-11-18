@@ -13,15 +13,22 @@ class hangmanServer:
         self.net = HOAStryngS(serverPort)
         self.clientIDToUsername = dict()
         self.gameIDtoGame = dict()
+        self.clientIDToGameID = dict()
         #end init
 
     def __processRegister(self, clientID, RegisterRequest):
         username = RegisterRequest["Data"]
         # print for now - to check that everything is working
         print(username)
-        # check if username is valid
-
-        #### MORE HANDLING HERE LATER..................................................
+        
+        # check if username is valid (size limit) + unique 
+        if len(username) > 20:
+            self.net.sendDataToClient(clientID, "41", "Invalid Method Parameter")
+            return
+        
+        if username in self.clientIDToUsername.values():
+            self.net.sendDataToClient(clientID, "41", "Invalid Method Parameter")
+            return
         
         # assign username to clientID
         self.clientIDToUsername[clientID] = username
@@ -71,8 +78,10 @@ class hangmanServer:
 
         # add the creator to the game - and return status
         if self.gameIDtoGame[gameID].addPlayer(clientID):
+            self.clientIDToGameID[clientID] = gameID
             self.net.sendDataToClient(clientID, "20", "OK", creationInfo)
         else:
+            del self.gameIDtoGame[gameID] 
             self.net.sendDataToClient(clientID, "50", "Internal Server Error")
         #end __processCreate
 
@@ -98,63 +107,95 @@ class hangmanServer:
         # Phase 2: send the stuff out
         # add the creator to the game - and return status
         if self.gameIDtoGame[gameID].addPlayer(clientID):
+            self.clientIDToGameID[clientID] = gameID
             self.net.sendDataToClient(clientID, "20", "OK", joinInfo)
         else:
             self.net.sendDataToClient(clientID, "44", "Cannot Join Game")
         #end __processJoin
 
 
-    def __processExit(self, clientID, RegisterRequest):
-        print(clientID)
+    def __processExit(self, clientID, ExitRequest):
+        # Phase 0: check if gameID is none
+        if clientID not in self.clientIDToGameID.keys():
+            self.net.sendDataToClient(clientID, "42", "Illegal Request")
+            return
+
+        gameID = self.clientIDToGameID[clientID]
+        
+        # Phase 1: check if gameID exists (and is valid)
+        if gameID not in self.gameIDtoGame.keys():
+            self.net.sendDataToClient(clientID, "50", "Internal Server Error")
+            return
+        
+        # Phase 2: exit game
+        if self.gameIDtoGame[gameID].removePlayer(clientID):
+            del self.clientIDToGameID[clientID]
+            if self.gameIDtoGame[gameID].getNumPlayers() == 0:
+                del self.gameIDtoGame[gameID]
+            self.net.sendDataToClient(clientID, "20", "OK")
+        else:
+            self.net.sendDataToClient(clientID, "50", "Internal Server Error")
         #end __processList
 
 
-    def __processUnregister(self, clientID, RegisterRequest):
-        print(clientID)
+    def __processUnregister(self, clientID, unregisterRequest):
+        #Phase 1: check if in game
+        if clientID in self.clientIDToGameID.keys():
+            gameID = self.clientIDToGameID[clientID]
+            self.gameIDtoGame[gameID].removePlayer(clientID)
+            if self.gameIDtoGame[gameID].numPlayers() == 0:
+                del self.gameIDtoGame[gameID]
+            del self.clientIDToGameID[clientID]
+        
+        # Phase 2: Unregister (will already not be in a game by here...)
+        # remove from association of clientID to usernames (removing them from being a valid player...?)
+        del self.clientIDToUsername[clientID]
+        self.net.sendDataToClient(clientID, "20", "OK")
+        
+        self.net.removeClient(clientID)
         #end __processList
 
 
-    def __processGuessWord(self, clientID, RegisterRequest):
+    def __processGuessWord(self, clientID, guessWordRequest):
         print(clientID)
         #end __processList
     
 
-    def __processSelectWord(self, clientID, RegisterRequest):
+    def __processSelectWord(self, clientID, selectWordRequest):
         print(clientID)
         #end __processList
 
 
-    def __processInitGuesser(self, clientID, RegisterRequest):
+    def __processInitGuesser(self, clientID, initGuesserRequest):
         print(clientID)
         #end __processList
 
 
-    def __processAskGameState(self, clientID, RegisterRequest):
+    def __processAskGameState(self, clientID, askGameStateRequest):
         print(clientID)
         #end __processList
 
 
-    def __processGetMyPoints(self, clientID, RegisterRequest):
+    def __processGetMyPoints(self, clientID, getMyPointsRequest):
         print(clientID)
         #end __GetMyPoints
 
 
-    def __processGetOpponentPoints(self, clientID, RegisterRequest):
+    def __processGetOpponentPoints(self, clientID, getOpponentPointsRequest):
         print(clientID)
         #end __GetOpponentPoints
 
 
-    def __processGetScoreBoard(self, clientID, RegisterRequest):
+    def __processGetScoreBoard(self, clientID, getScoreBoardRequest):
         print(clientID)
         #end __processList
 
 
-    #more process requests methods here...
 
     def server(self):
-        while(True):
+        index = 0
 
-            print("here HS - 2")
+        while(True):
 
             #check for new client
             newClientID = self.net.pollForNewClientConnection()
@@ -163,12 +204,24 @@ class hangmanServer:
             if(newClientID != -1):  ##is not None):
                 self.clientIDToUsername[newClientID] = "" 
 
-            print("here HS - 5")
 
             #poll each of the clients to see if they have sent a request
-            for clientID in self.clientIDToUsername:
 
-                print("here HS - 7")
+            # while index < len(self.clientIDToUsername):
+
+            #     #code
+            #     #/code
+            #     index += 1
+
+            
+
+
+            #get client list
+            
+            clients = list(self.clientIDToUsername.keys())
+
+            for clientID in clients:
+
                 newRequest = self.net.pollClientForRequest(clientID)
                 if newRequest is None:
                     #skip

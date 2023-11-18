@@ -9,8 +9,9 @@ class HOAStryngC:
 
     # funtions
 
-    def __init__(self, hostName, portNumber):
-        self.__prepSocket(hostName, portNumber)
+    def __init__(self):
+        #self.__prepSocket(hostName, portNumber)
+        print("init")
 
     # set up socket 
     def __prepSocket(self, hostName, portNumber):
@@ -96,7 +97,8 @@ class HOAStryngC:
 
 
     # register
-    def register(self, username):
+    def register(self, hostName, portNumber, username):
+        self.__prepSocket(hostName, portNumber)
         # build the packet using our protocol 
         packet = self.PROTOCOL_HEADER + "REGI\n" + username + self.DELIM
         # send the packet and return result 
@@ -144,8 +146,12 @@ class HOAStryngC:
     def unregister(self):
         # build the packet using our protocol 
         packet = self.PROTOCOL_HEADER + "UNRG\n" + self.DELIM
-        # send the packet and return result 
-        return self.__sendRequestAndReturnResponse(packet)
+        # send the packet and get response
+        response =  self.__sendRequestAndReturnResponse(packet)
+        # close the socket 
+        self.clientSocket.close()
+        # return the socket
+        return response
         # end unregister
 
 
