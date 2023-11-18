@@ -193,7 +193,6 @@ class hangmanServer:
 
 
     def server(self):
-        index = 0
 
         while(True):
 
@@ -205,23 +204,10 @@ class hangmanServer:
                 self.clientIDToUsername[newClientID] = "" 
 
 
-            #poll each of the clients to see if they have sent a request
-
-            # while index < len(self.clientIDToUsername):
-
-            #     #code
-            #     #/code
-            #     index += 1
-
-            
-
-
-            #get client list
-            
+            #get client list            
             clients = list(self.clientIDToUsername.keys())
-
+            #poll each of the clients to see if they have sent a request
             for clientID in clients:
-
                 newRequest = self.net.pollClientForRequest(clientID)
                 if newRequest is None:
                     #skip
@@ -274,8 +260,7 @@ class hangmanServer:
                 else:
                     #unexpected to reach here because HOAStryngS should have it filtered out.
                     print("Something went wrong with a recent recieved request (Malformed Request)")                
-                #end for
-                    
+                #end for                    
         #end server
 
 

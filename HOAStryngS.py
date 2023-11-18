@@ -36,24 +36,6 @@ class HOAStryngS:
     # returns the packet read, or none if the connection
     # has not sent anything to this socket
     def __nonBlockingRecieveFrom(self, connectionSocket):
-        # # check if the connectionSocket has anything to read
-        # read_list = [connectionSocket]
-        # readable, writable, errored = select.select(read_list, [], [], 0.1)
-
-        # # if socket does have something to read, accept a new client connection
-        # for s in readable:
-        #     if s is connectionSocket:
-        #         packet = connectionSocket.recv(1024).decode()
-        #         if len(packet) > 0:
-        #             while packet.find(self.DELIM) == -1:
-        #                 packet += connectionSocket.recv(1024).decode()
-        #                 return packet
-                    
-        # return None
-        
-        
-        
-        ### old method below for this FN
         # the connectionSocket was set to non-blocking earlier
         connectionSocket.setblocking(0)
         packet = connectionSocket.recv(1024).decode()
@@ -127,8 +109,6 @@ class HOAStryngS:
         for s in readable:
             if s is self.serverListenerSock:
                 connectionSocket, clientAddress = self.serverListenerSock.accept()
-                # set connection to be non-blocking so we can poll 
-                # connectionSocket.setblocking(0)
                 # add generate unique ID and add connection to list of active clients
                 clientID = self.__getNewClientID()
                 self.activeClientConnections[clientID] = connectionSocket
