@@ -75,43 +75,74 @@ class hangmanServer:
         else:
             self.net.sendDataToClient(clientID, "50", "Internal Server Error")
         #end __processCreate
-        
 
-    def __processJoin(self, clientID, RegisterRequest):
-        print(clientID)
-        #end __processList
+
+    def __processJoin(self, clientID, JoinRequest):
+        gameID = int(JoinRequest["Data"])
+
+        # Phase 1 :check if gameID exists (and is valid)
+        if gameID not in self.gameIDtoGame.keys():
+            self.net.sendDataToClient(clientID, "44", "Cannot Join Game")
+            return
+
+        joinInfo = dict()
+        #implicit guesser decision
+        if self.gameIDtoGame[gameID].getGuesser() is None:
+            #youre it
+            joinInfo["You Are Guesser"] = True
+            self.gameIDtoGame[gameID].guesser = clientID    
+
+        else:
+            joinInfo["You Are Guesser"] = False
+        
+        # Phase 2: send the stuff out
+        # add the creator to the game - and return status
+        if self.gameIDtoGame[gameID].addPlayer(clientID):
+            self.net.sendDataToClient(clientID, "20", "OK", joinInfo)
+        else:
+            self.net.sendDataToClient(clientID, "44", "Cannot Join Game")
+        #end __processJoin
+
 
     def __processExit(self, clientID, RegisterRequest):
         print(clientID)
         #end __processList
 
+
     def __processUnregister(self, clientID, RegisterRequest):
         print(clientID)
         #end __processList
+
 
     def __processGuessWord(self, clientID, RegisterRequest):
         print(clientID)
         #end __processList
     
+
     def __processSelectWord(self, clientID, RegisterRequest):
         print(clientID)
         #end __processList
+
 
     def __processInitGuesser(self, clientID, RegisterRequest):
         print(clientID)
         #end __processList
 
+
     def __processAskGameState(self, clientID, RegisterRequest):
         print(clientID)
         #end __processList
+
 
     def __processGetMyPoints(self, clientID, RegisterRequest):
         print(clientID)
         #end __GetMyPoints
 
+
     def __processGetOpponentPoints(self, clientID, RegisterRequest):
         print(clientID)
         #end __GetOpponentPoints
+
 
     def __processGetScoreBoard(self, clientID, RegisterRequest):
         print(clientID)

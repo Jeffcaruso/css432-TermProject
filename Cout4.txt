@@ -6,5 +6,9 @@ here HC - 5
 *** List Games ***
 20
 dict_items([('1', 'usernameA'), ('2', 'usernameB')])
-GameID: 2560
+Create Game:
+GameID: 1098
+AreGuesser: True
+Join Game:
+status code: 20
 AreGuesser: False

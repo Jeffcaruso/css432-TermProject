@@ -33,8 +33,15 @@ class hangmanClient:
 
 
         Info = self.net.createNewGame()
+        print("Create Game:")
         print("GameID: " + str(Info["Data"]["GameID"]))
         print("AreGuesser: " + str(Info["Data"]["You Are Guesser"]))
+
+
+        Info2 = self.net.joinGame(Info["Data"]["GameID"])
+        print("Join Game:")
+        print("status code: " + Info2["Status Code"])
+        print("AreGuesser: " + str(Info2["Data"]["You Are Guesser"]))
 
 
     

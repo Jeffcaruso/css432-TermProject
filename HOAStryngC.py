@@ -125,7 +125,7 @@ class HOAStryngC:
     # join a game 
     def joinGame(self, gameID):
         # build the packet using our protocol 
-        packet = self.PROTOCOL_HEADER + "JOIN\n" + gameID + self.DELIM
+        packet = self.PROTOCOL_HEADER + "JOIN\n" + str(gameID) + self.DELIM
         # send the packet and return result 
         return self.__sendRequestAndReturnResponse(packet)
         # end join game

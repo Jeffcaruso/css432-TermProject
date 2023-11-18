@@ -24,10 +24,20 @@ class game:
     #roundLost() # hangman fullly displayed
     #roundInProgress()
     #getNumPlayers()
-    #getword()
-    #getCensoredWord()
+
+    def getWord(self):
+        return self.word
+        #end getWord
+
+    def getCensoredWord(self):
+        return self.censoredWord
+
     #startNewRound() 
-    #getGuesser() {return clientID}
+    
+
+    def getGuesser(self):
+        return self.guesser
+        #end getGuesser 
 
 
     def gameIsFull(self): 

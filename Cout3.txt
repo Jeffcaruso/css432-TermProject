@@ -1,0 +1,14 @@
+*** Register ***
+20
+here HC - 5
+*** Register ***
+20
+*** List Games ***
+20
+dict_items([('1', 'usernameA'), ('2', 'usernameB')])
+Create Game:
+GameID: 9040
+AreGuesser: True
+Join Game:
+status code: 20
+AreGuesser: False
