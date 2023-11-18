@@ -1,5 +1,7 @@
 import sys
 from HOAStryngS import HOAStryngS
+import random
+from game import game
 
 # will check for a new client connection
 # will loop through client IDs
@@ -10,6 +12,7 @@ class hangmanServer:
     def __init__(self, serverPort):
         self.net = HOAStryngS(serverPort)
         self.clientIDToUsername = dict()
+        self.gameIDtoGame = dict()
         #end init
 
     def __processRegister(self, clientID, RegisterRequest):
@@ -31,14 +34,48 @@ class hangmanServer:
     def __processList(self, clientID):
         print("got to processList")
 
+        #NOTE, these need to be gameID, username
         gameList = {1 : "usernameA",  2 : "usernameB" } 
 
         self.net.sendDataToClient(clientID, "20", "OK", gameList)
         #end __processList
     
+
+    # generates a new unique four digit client ID number
+    def __getNewGameID(self):
+        # generate random # [0,9999]
+        tempID = random.randrange(0, 9999, 1)
+
+        while(tempID in self.gameIDtoGame.keys()):
+            #while tempIDis one of the keys, keep trying
+            tempID = random.randrange(0, 9999, 1)
+            
+        return tempID
+        #end __createNewClientID
+
+
     def __processCreate(self, clientID, RegisterRequest):
-        print(clientID)
-        #end __processList
+        # generate new (unique) gameID and create new game
+        gameID = self.__getNewGameID()
+        self.gameIDtoGame[gameID] = game(gameID)
+
+        creationInfo = dict()
+        creationInfo["GameID"] = gameID
+        
+        #decide guesser
+        if random.randrange(0, 2, 1):
+            creationInfo["You Are Guesser"] = True
+            self.gameIDtoGame[gameID].guesser = clientID            
+        else:
+            creationInfo["You Are Guesser"] = False
+
+        # add the creator to the game - and return status
+        if self.gameIDtoGame[gameID].addPlayer(clientID):
+            self.net.sendDataToClient(clientID, "20", "OK", creationInfo)
+        else:
+            self.net.sendDataToClient(clientID, "50", "Internal Server Error")
+        #end __processCreate
+        
 
     def __processJoin(self, clientID, RegisterRequest):
         print(clientID)

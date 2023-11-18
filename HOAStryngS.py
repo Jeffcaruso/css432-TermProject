@@ -140,7 +140,6 @@ class HOAStryngS:
         methodType = hdr[1].split("\n",1)
 
         #methodType[0] is method Type
-
         if methodType[0] not in self.ACCEPTED_METHOD_TYPES:
             self.__sendToSocket((self.PROTOCOL_HEADER + "40 " + "Invalid Method Type\n" + self.DELIM))
             return None; 
@@ -151,7 +150,6 @@ class HOAStryngS:
 
 
     def sendDataToClient(self, clientID,  statusCode: str="20", statusMessage="OK", data=None):
-        #packet
         if (data is not None):
             jsonDumpedData = json.dumps(data)
             packet = self.PROTOCOL_HEADER + statusCode + " " + statusMessage + "\n" + jsonDumpedData + self.DELIM

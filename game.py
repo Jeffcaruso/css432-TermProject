@@ -30,7 +30,33 @@ class game:
     #getGuesser() {return clientID}
 
 
+    def gameIsFull(self): 
+        return len(self.clientIDtoScore.keys()) >= 2
+        #end gameIsFull
+
+
+    def addPlayer(self, clientID):
+        # check if game is full
+        if self.gameIsFull():
+            return False
+        
+        self.clientIDtoScore[clientID] = 0
+        return True
+        #end addPlayer 
+
+
+    def removePlayer(self, clientID):
+        if len(self.clientIDtoScore.keys()) == 0:
+            return False
+        
+        if clientID in self.clientIDtoScore.keys():
+            return False
+        
+        del self.clientIDtoScore[clientID]
+        return True
+        #end player 
+
+
 
 
     #end of game class
-#

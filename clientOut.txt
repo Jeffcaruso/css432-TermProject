@@ -1,23 +1,10 @@
 *** Register ***
-here HCS - 3
-here HCS - 4
-here HCS - 5
-~~~~~~()
-data()
-here HCS
 20
 here HC - 5
 *** Register ***
-here HCS - 3
-here HCS - 4
-here HCS - 5
-~~~~~~()
-data()
-here HCS
 20
 *** List Games ***
-{"1": "usernameA", "2": "usernameB"}~~~~~~()
-data({"1": "usernameA", "2": "usernameB"})
-here HCS{"1": "usernameA", "2": "usernameB"}
 20
 dict_items([('1', 'usernameA'), ('2', 'usernameB')])
+GameID: 2560
+AreGuesser: False

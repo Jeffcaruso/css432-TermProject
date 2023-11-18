@@ -32,6 +32,10 @@ class hangmanClient:
         #end 
 
 
+        Info = self.net.createNewGame()
+        print("GameID: " + str(Info["Data"]["GameID"]))
+        print("AreGuesser: " + str(Info["Data"]["You Are Guesser"]))
+
 
     
     #end hangman client

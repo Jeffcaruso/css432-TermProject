@@ -59,12 +59,10 @@ class HOAStryngC:
         # get data 
         
         dataAndDelim = statusMsg[1]
-        print(dataAndDelim)
         #data = dataAndDelim[1].split(self.DELIM, 1)
         data = dataAndDelim.split(self.DELIM,1)
-        print("data(" + data[0] + ")")
+        #print("data(" + data[0] + ")")
 
-        print("here HCS" + data[0])
         # if there was data 
         if len(data[0]) != 0 :
             data_loaded = json.loads(data[0])
@@ -85,21 +83,24 @@ class HOAStryngC:
         #end processReturnedInfo
         
 
+    # end a constructed request packet, wait for a response
+    # and then return a dic with a processsed return
+    def __sendRequestAndReturnResponse(self, packet):
+        # send the packet
+        self.__sendToSocket(packet)
+        # read response from server
+        response = self.__recieveFromSocket()
+        # process the returned packet and send back a return dict
+        return self.__processReturnedInfo(response)
+        #end of __sendRequestAndReturnResponse
+
 
     # register
     def register(self, username):
         # build the packet using our protocol 
         packet = self.PROTOCOL_HEADER + "REGI\n" + username + self.DELIM
-        print("here HCS - 3")
-        # send the packet
-        self.__sendToSocket(packet)
-        print("here HCS - 4")
-        
-        # read response from server
-        response = self.__recieveFromSocket()
-        print("here HCS - 5")
-        # process the returned packet and send back a return dict
-        return self.__processReturnedInfo(response)
+        # send the packet and return result 
+        return self.__sendRequestAndReturnResponse(packet)
         # end of register
 
 
@@ -107,12 +108,8 @@ class HOAStryngC:
     def requestGamesList(self):
         # build the packet using our protocol 
         packet = self.PROTOCOL_HEADER + "LIST\n" + self.DELIM
-        # send the packet
-        self.__sendToSocket(packet)
-        # read response from server
-        response = self.__recieveFromSocket()
-        # process the returned packet and send back a return dict
-        return self.__processReturnedInfo(response)
+        # send the packet and return result 
+        return self.__sendRequestAndReturnResponse(packet)
         # end of requestGamesList
     
 
@@ -120,25 +117,17 @@ class HOAStryngC:
     def createNewGame(self):
         # build the packet using our protocol 
         packet = self.PROTOCOL_HEADER + "CREA\n" + self.DELIM
-        # send the packet
-        self.__sendToSocket(packet)
-        # read response from server
-        response = self.__recieveFromSocket()
-        # process the returned packet and send back a return dict
-        return self.__processReturnedInfo(response)
+        # send the packet and return result 
+        return self.__sendRequestAndReturnResponse(packet)
         # end of createNewGame
 
 
     # join a game 
     def joinGame(self, gameID):
         # build the packet using our protocol 
-        packet = self.PROTOCOL_HEADER + "JOIN\n" + self.DELIM
-        # send the packet
-        self.__sendToSocket(packet)
-        # read response from server
-        response = self.__recieveFromSocket()
-        # process the returned packet and send back a return dict
-        return self.__processReturnedInfo(response)
+        packet = self.PROTOCOL_HEADER + "JOIN\n" + gameID + self.DELIM
+        # send the packet and return result 
+        return self.__sendRequestAndReturnResponse(packet)
         # end join game
 
 
@@ -146,12 +135,8 @@ class HOAStryngC:
     def exitGame(self):
         # build the packet using our protocol 
         packet = self.PROTOCOL_HEADER + "EXIT\n" + self.DELIM
-        # send the packet
-        self.__sendToSocket(packet)
-        # read response from server
-        response = self.__recieveFromSocket()
-        # process the returned packet and send back a return dict
-        return self.__processReturnedInfo(response)
+        # send the packet and return result 
+        return self.__sendRequestAndReturnResponse(packet)
         # end exitGame
 
 
@@ -159,46 +144,36 @@ class HOAStryngC:
     def unregister(self):
         # build the packet using our protocol 
         packet = self.PROTOCOL_HEADER + "UNRG\n" + self.DELIM
-        # send the packet
-        self.__sendToSocket(packet)
-        # read response from server
-        response = self.__recieveFromSocket()
-        # process the returned packet and send back a return dict
-        return self.__processReturnedInfo(response)
+        # send the packet and return result 
+        return self.__sendRequestAndReturnResponse(packet)
         # end unregister
 
 
     # guess letter
     def guessLetter(self, guessedLetter):
         # build the packet using our protocol 
-        packet = self.PROTOCOL_HEADER + "GUEL\n" + self.DELIM
-        # send the packet
-        self.__sendToSocket(packet)
-        # read response from server
-        response = self.__recieveFromSocket()
-        # process the returned packet and send back a return dict
-        return self.__processReturnedInfo(response)
+        packet = self.PROTOCOL_HEADER + "GUEL\n" + guessedLetter + self.DELIM
+        # send the packet and return result 
+        return self.__sendRequestAndReturnResponse(packet)
         # end guessLetter
 
 
-    #NOTE, not necessary, complete this later
-    # guess word (optional)
+    ## NOTE, EC, complete this later...
+    # guess word 
     def __guessWord(self, guessedWord):
         # build the packet using our protocol 
-        print("delete this later")
+        packet = self.PROTOCOL_HEADER + "GUEW\n" + guessedWord + self.DELIM
+        # send the packet and return result 
+        return self.__sendRequestAndReturnResponse(packet)
         #end guessWord
 
 
     # select a word
     def selectWord(self, enteredWord):
         # build the packet using our protocol 
-        packet = self.PROTOCOL_HEADER + "SLWD\n" + self.DELIM
-        # send the packet
-        self.__sendToSocket(packet)
-        # read response from server
-        response = self.__recieveFromSocket()
-        # process the returned packet and send back a return dict
-        return self.__processReturnedInfo(response)
+        packet = self.PROTOCOL_HEADER + "SLWD\n" + enteredWord + self.DELIM
+        # send the packet and return result 
+        return self.__sendRequestAndReturnResponse(packet)
         #end selectWord
 
 
@@ -206,12 +181,8 @@ class HOAStryngC:
     def initGuesser(self):
         # build the packet using our protocol 
         packet = self.PROTOCOL_HEADER + "INIG\n" + self.DELIM
-        # send the packet
-        self.__sendToSocket(packet)
-        # read response from server
-        response = self.__recieveFromSocket()
-        # process the returned packet and send back a return dict
-        return self.__processReturnedInfo(response)
+        # send the packet and return result 
+        return self.__sendRequestAndReturnResponse(packet)
         #end initGuesser
 
 
@@ -219,12 +190,8 @@ class HOAStryngC:
     def askGameState(self):
         # build the packet using our protocol 
         packet = self.PROTOCOL_HEADER + "AKGS\n" + self.DELIM
-        # send the packet
-        self.__sendToSocket(packet)
-        # read response from server
-        response = self.__recieveFromSocket()
-        # process the returned packet and send back a return dict
-        return self.__processReturnedInfo(response)
+        # send the packet and return result 
+        return self.__sendRequestAndReturnResponse(packet)
         #end askGameState
 
 
@@ -232,12 +199,8 @@ class HOAStryngC:
     def getMyPoints(self):
         # build the packet using our protocol 
         packet = self.PROTOCOL_HEADER + "GMPT\n" + self.DELIM
-        # send the packet
-        self.__sendToSocket(packet)
-        # read response from server
-        response = self.__recieveFromSocket()
-        # process the returned packet and send back a return dict
-        return self.__processReturnedInfo(response)
+        # send the packet and return result 
+        return self.__sendRequestAndReturnResponse(packet)
         #end getMyPoints
 
 
@@ -245,12 +208,9 @@ class HOAStryngC:
     def getOpponentPoints(self):
         # build the packet using our protocol 
         packet = self.PROTOCOL_HEADER + "GOPT\n" + self.DELIM
-        # send the packet
-        self.__sendToSocket(packet)
-        # read response from server
-        response = self.__recieveFromSocket()
-        # process the returned packet and send back a return dict
-        return self.__processReturnedInfo(response)
+        # send the packet and return result 
+        return self.__sendRequestAndReturnResponse(packet)
+        #end getOpponetsPoints
 
 
     ## NOTE, EC, complete this later...
@@ -258,14 +218,9 @@ class HOAStryngC:
     def getScoreboard(self):
         # build the packet using our protocol 
         packet = self.PROTOCOL_HEADER + "GTSB\n" + self.DELIM
-        # send the packet
-        self.__sendToSocket(packet)
-        # read response from server
-        response = self.__recieveFromSocket()
-        # process the returned packet and send back a return dict
-        return self.__processReturnedInfo(response)
+        # send the packet and return result 
+        return self.__sendRequestAndReturnResponse(packet)
         #end getScoreboard
-
 
     # <end of class>
 
