@@ -122,8 +122,6 @@ class HOAStryngS:
         
 
 
-
-
     # poll for client request
     # return tuple with first value being method type, and the rest being the parameters 
     # that the client sent with that method.
@@ -152,77 +150,16 @@ class HOAStryngS:
         #end of pollClientForRequest
 
 
-    # send ACK for register (or NACK) 
-    # registrationStatus is either OK or NO
-    def sendRegistrationStatus(self, clientID, statusCode: str, statusMessage):
-        packet = self.PROTOCOL_HEADER + statusCode + " " + statusMessage + "\n" + self.DELIM
+    def sendDataToClient(self, clientID,  statusCode: str="20", statusMessage="OK", data=None):
+        #packet
+        if (data is not None):
+            jsonDumpedData = json.dumps(data)
+            packet = self.PROTOCOL_HEADER + statusCode + " " + statusMessage + "\n" + jsonDumpedData + self.DELIM
+        else:
+            packet = self.PROTOCOL_HEADER + statusCode + " " + statusMessage + "\n" + self.DELIM
         self.__sendToSocket(clientID, packet)
-        # end sendRegistrationStatus
-
-
-    # send game list
-    def sendGameList(self, clientID,  statusCode: str, statusMessage, gameList):
-
-        dataString = json.dumps(gameList)
-        packet = self.PROTOCOL_HEADER + statusCode + " " + statusMessage + "\n" + dataString + self.DELIM
-        self.__sendToSocket(clientID, packet)
-        # end sendGameList
-
-
-    # send game id to ACK create/join game + who starts first 
-    def sendGameInfoInit(self, clientID, intialGameState):
-        print("delete this later")
-        # end sendGameInfoInit
-
-
-    # # send ACK for leaving game - Probably dont need these
-    # def sendGameExit():
-
-    #     #end processGameExit
-
-
-    # # send ACK for unregistering
-
-
-    # ACK letter guess give updated amount of word known
-    def sendUpdatedGameData(self, clientID, currentWordData):
-        print("delete this later")
-        #end sendUpdatedGameData
-
-    # ACK guess word (optional)
-
-
-    # ACK word select (if it is accepted)
-    def sendWordSelectionACK(self, clientID, wordOk):
-        print("delete this later")
-        #end sendWordSelectionACK
-
-
-    # # initialize guesser (send initial word)
-    # def initGuesser() # use sendUpdatedGameData
-
-
-    # send game state (win,loss, gamestate)
-    def sendGameState(self, clientID, gameState):
-        print("delete this later")
-        #end sendGameState
-
-
-    def sendYourPoints(self, clientID, points):
-        print("delete this later")
-        #end sendYourPoints
-
-
-    def sendOpponentPoints(self, clientID, points):
-        print("delete this later")
-        #end sendOpponentPoints
-
-
-    # send scoreboard
-    def sendScoreboard(self, clientID, scoreboard):
-        print("delete this later")
-        # end sendScoreboard
-
+        #end of sendDataToClient
+        
     #end HOAStryngS
 
 

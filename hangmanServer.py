@@ -24,7 +24,7 @@ class hangmanServer:
         self.clientIDToUsername[clientID] = username
 
         # send status back to client
-        self.net.sendRegistrationStatus(clientID, "20", "OK")
+        self.net.sendDataToClient(clientID, "20", "OK")
         #end __processRegister
 
 
@@ -33,7 +33,7 @@ class hangmanServer:
 
         gameList = {1 : "usernameA",  2 : "usernameB" } 
 
-        self.net.sendGameList(clientID, "20", "OK", gameList)
+        self.net.sendDataToClient(clientID, "20", "OK", gameList)
         #end __processList
     
     def __processCreate(self, clientID, RegisterRequest):

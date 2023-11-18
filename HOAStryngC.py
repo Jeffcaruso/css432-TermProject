@@ -45,7 +45,7 @@ class HOAStryngC:
         #end of recieveFromSocket
 
 
-    def processReturnedInfo(self, response):
+    def __processReturnedInfo(self, response):
         # first space is the end of the protocol header
         hdr = response.split(" ", 1)
         
@@ -85,6 +85,7 @@ class HOAStryngC:
         #end processReturnedInfo
         
 
+
     # register
     def register(self, username):
         # build the packet using our protocol 
@@ -98,7 +99,7 @@ class HOAStryngC:
         response = self.__recieveFromSocket()
         print("here HCS - 5")
         # process the returned packet and send back a return dict
-        return self.processReturnedInfo(response)
+        return self.__processReturnedInfo(response)
         # end of register
 
 
@@ -111,7 +112,7 @@ class HOAStryngC:
         # read response from server
         response = self.__recieveFromSocket()
         # process the returned packet and send back a return dict
-        return self.processReturnedInfo(response)
+        return self.__processReturnedInfo(response)
         # end of requestGamesList
     
 
@@ -124,7 +125,7 @@ class HOAStryngC:
         # read response from server
         response = self.__recieveFromSocket()
         # process the returned packet and send back a return dict
-        return self.processReturnedInfo(response)
+        return self.__processReturnedInfo(response)
         # end of createNewGame
 
 
@@ -137,7 +138,7 @@ class HOAStryngC:
         # read response from server
         response = self.__recieveFromSocket()
         # process the returned packet and send back a return dict
-        return self.processReturnedInfo(response)
+        return self.__processReturnedInfo(response)
         # end join game
 
 
@@ -150,7 +151,7 @@ class HOAStryngC:
         # read response from server
         response = self.__recieveFromSocket()
         # process the returned packet and send back a return dict
-        return self.processReturnedInfo(response)
+        return self.__processReturnedInfo(response)
         # end exitGame
 
 
@@ -163,7 +164,7 @@ class HOAStryngC:
         # read response from server
         response = self.__recieveFromSocket()
         # process the returned packet and send back a return dict
-        return self.processReturnedInfo(response)
+        return self.__processReturnedInfo(response)
         # end unregister
 
 
@@ -176,7 +177,7 @@ class HOAStryngC:
         # read response from server
         response = self.__recieveFromSocket()
         # process the returned packet and send back a return dict
-        return self.processReturnedInfo(response)
+        return self.__processReturnedInfo(response)
         # end guessLetter
 
 
@@ -197,8 +198,7 @@ class HOAStryngC:
         # read response from server
         response = self.__recieveFromSocket()
         # process the returned packet and send back a return dict
-        return self.processReturnedInfo(response)
-        
+        return self.__processReturnedInfo(response)
         #end selectWord
 
 
@@ -211,7 +211,7 @@ class HOAStryngC:
         # read response from server
         response = self.__recieveFromSocket()
         # process the returned packet and send back a return dict
-        return self.processReturnedInfo(response)
+        return self.__processReturnedInfo(response)
         #end initGuesser
 
 
@@ -224,7 +224,7 @@ class HOAStryngC:
         # read response from server
         response = self.__recieveFromSocket()
         # process the returned packet and send back a return dict
-        return self.processReturnedInfo(response)
+        return self.__processReturnedInfo(response)
         #end askGameState
 
 
@@ -237,7 +237,7 @@ class HOAStryngC:
         # read response from server
         response = self.__recieveFromSocket()
         # process the returned packet and send back a return dict
-        return self.processReturnedInfo(response)
+        return self.__processReturnedInfo(response)
         #end getMyPoints
 
 
@@ -250,7 +250,7 @@ class HOAStryngC:
         # read response from server
         response = self.__recieveFromSocket()
         # process the returned packet and send back a return dict
-        return self.processReturnedInfo(response)
+        return self.__processReturnedInfo(response)
 
 
     ## NOTE, EC, complete this later...
@@ -263,7 +263,7 @@ class HOAStryngC:
         # read response from server
         response = self.__recieveFromSocket()
         # process the returned packet and send back a return dict
-        return self.processReturnedInfo(response)
+        return self.__processReturnedInfo(response)
         #end getScoreboard
 
 
