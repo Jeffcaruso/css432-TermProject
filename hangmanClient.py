@@ -68,8 +68,11 @@ class hangmanClient:
         print("3 - Join an existing game")
         print("4 - Disconnect from server (unregister)")
 
-        option = int(input("Enter option number: "))
-        
+        try:
+            option = int(input("Enter option number: "))
+        except:
+            option = -1
+
         if option == 1:
             self.createGame()
         elif option == 2:
@@ -92,7 +95,8 @@ class hangmanClient:
         
         
         if statusCode == "20":
-            print("play game")
+            IAmGuesser = response["Data"]["You Are Guesser"]
+            self.playGame(IAmGuesser)
         else:
             print("could not create game")
         #end create game
@@ -109,7 +113,7 @@ class hangmanClient:
 
         else:
             print("unexpected error")
-        #end create game
+        #end list game
 
 
     def joinGame(self):
@@ -118,12 +122,18 @@ class hangmanClient:
         statusCode = response["Status Code"]
         
         if statusCode == "20":
-            print("play game")
+            IAmGuesser = response["Data"]["You Are Guesser"]
+            self.playGame(IAmGuesser)
         else:
             print("could not join game " + str(gameID))
-        #end create game
+        #end joingame
     
     
+    def playGame(self, IAmGuesser):
+
+
+        print("Playing the game")
+        #end playGame
 
 
 

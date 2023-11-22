@@ -24,6 +24,7 @@ class hangmanServer:
         # check if username is valid (size limit) + unique 
         if len(username) > 20:
             self.net.sendDataToClient(clientID, "41", "Invalid Method Parameter")
+            self.net.removeClient(clientID)
             return
         
         if username in self.clientIDToUsername.values():
@@ -80,6 +81,10 @@ class hangmanServer:
 
 
     def __processCreate(self, clientID, RegisterRequest):
+        if self.__alreadyInGame(clientID):
+            self.net.sendDataToClient(clientID, "42", "Illegal Request")
+            return
+        
         # generate new (unique) gameID and create new game
         gameID = self.__getNewGameID()
         self.gameIDtoGame[gameID] = game(gameID)
@@ -107,10 +112,15 @@ class hangmanServer:
     def __processJoin(self, clientID, JoinRequest):
         gameID = int(JoinRequest["Data"])
 
+        if self.__alreadyInGame(clientID):
+            self.net.sendDataToClient(clientID, "42", "Illegal Request")
+            return
+
         # Phase 1 :check if gameID exists (and is valid)
         if gameID not in self.gameIDtoGame.keys():
             self.net.sendDataToClient(clientID, "44", "Cannot Join Game")
             return
+    
 
         joinInfo = dict()
         #implicit guesser decision
@@ -130,6 +140,11 @@ class hangmanServer:
         else:
             self.net.sendDataToClient(clientID, "44", "Cannot Join Game")
         #end __processJoin
+
+
+    def __alreadyInGame(self, clientID):
+        return clientID in self.clientIDToGameID.keys()
+        #end already in game
 
 
     def __processExit(self, clientID, ExitRequest):

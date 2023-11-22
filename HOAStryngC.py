@@ -102,7 +102,11 @@ class HOAStryngC:
         # build the packet using our protocol 
         packet = self.PROTOCOL_HEADER + "REGI\n" + username + self.DELIM
         # send the packet and return result 
-        return self.__sendRequestAndReturnResponse(packet)
+        response =  self.__sendRequestAndReturnResponse(packet)
+        if response["Status Code"] != "20":
+            self.clientSocket.close()
+
+        return response
         # end of register
 
 
