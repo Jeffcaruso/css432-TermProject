@@ -87,7 +87,6 @@ class hangmanClient:
 
 
     def createGame(self):
-        print("option 1")
         response = self.net.createNewGame()
         statusCode = response["Status Code"]
         
@@ -100,19 +99,20 @@ class hangmanClient:
 
 
     def listGame(self):
-        print("option 2")
         response = self.net.requestGamesList()
         statusCode = response["Status Code"]
 
         if(statusCode == "20"):
-            print("play game")
+            gameList = response["Data"]
+            for gameInfo in gameList:
+                print(gameInfo)
+
         else:
             print("unexpected error")
         #end create game
 
 
     def joinGame(self):
-        print("option 3")
         gameID = int(input("Enter gameID: "))
         response = self.net.joinGame(gameID)
         statusCode = response["Status Code"]

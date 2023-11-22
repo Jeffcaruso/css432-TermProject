@@ -43,7 +43,24 @@ class hangmanServer:
         print("got to processList")
 
         #NOTE, these need to be gameID, username
-        gameList = {1 : "usernameA",  2 : "usernameB" } 
+        # gameList = {1 : "usernameA",  2 : "usernameB" } 
+        gameList = list()
+        #gameID, username1, username2
+
+        for gameID in self.gameIDtoGame.keys():
+            game = self.gameIDtoGame[gameID]
+            usernames = list()
+            for clientID in game.clientIDtoScore:
+                usernames.append(self.clientIDToUsername[clientID])
+            
+            gameInfo = {
+                "gameID" : gameID,
+                "usernames" : usernames
+            }
+
+            gameList.append(gameInfo)
+            #access
+
 
         self.net.sendDataToClient(clientID, "20", "OK", gameList)
         #end __processList
