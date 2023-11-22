@@ -13,6 +13,7 @@ class hangmanClient:
 
     def client(self):
         #def client(self, serverName, serverPort):
+        self.printHangmanDisplay(0)
         
         # Phase 1 : Join/Create, (all before first guess)
         self.setup()
@@ -135,7 +136,12 @@ class hangmanClient:
         print("Playing the game")
         #end playGame
 
-
+    def printHangmanDisplay(self, numIncorrectGuesses):
+        f = open('hangmanDisplay/0IncorrectGuesses.txt', 'r')
+        file_contents = f.read()
+        print (file_contents)
+        f.close()
+        #end printHangmanDisplay
 
 def main():
     client = hangmanClient()
