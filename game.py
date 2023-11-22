@@ -5,6 +5,9 @@
 
 
 class game:
+    NUM_ROUNDS_TILL_LOSE = 6
+    MAX_PLAYERS = 2
+
     def __init__(self, gameID):
         #generally staying the same once filled *except score, increasing over multiple rounds*
         self.gameID = gameID
@@ -20,23 +23,40 @@ class game:
     
 
     # round status methods...
-    #startNewRound() 
+    def startNewRound(self):
+
+        self.word = None
+        #end startNewRound()
 
 
     # round status methods
-    #roundWon() # word found
-    #roundLost() # hangman fullly displayed
-    #roundInProgress()
+    def roundWon(self): # word found
+        return self.word == self.censoredWord
+        #end roundWon()
+    
+
+    def roundLost(self): # hangman fullly displayed
+        return self.numIncorrectGuesses >= self.NUM_ROUNDS_TILL_LOSE
+        #end roundLost()
+    
+
+    def roundInProgress(self):
+        return not (self.roundWon() or self.roundLost())
+        #end roundInProgres()
+
+
 
     # word status methods 
     def getWord(self):
         return self.word
         #end getWord
 
+
     def getCensoredWord(self):
         return self.censoredWord
         #end getCensoredWord
     
+
 
     # get player status method
     def getNumPlayers(self):
@@ -45,7 +65,7 @@ class game:
 
 
     def gameIsFull(self): 
-        return self.getNumPlayers() >= 2
+        return self.getNumPlayers() >= self.MAX_PLAYERS
         #end gameIsFull
 
 
@@ -76,6 +96,5 @@ class game:
     def setGuesser(self, clientID):
         self.guesser = clientID
         #end setGuesser
-
 
     #end of game class

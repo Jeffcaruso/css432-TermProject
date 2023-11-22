@@ -28,6 +28,7 @@ class hangmanServer:
         
         if username in self.clientIDToUsername.values():
             self.net.sendDataToClient(clientID, "41", "Invalid Method Parameter")
+            self.net.removeClient(clientID)
             return
         
         # assign username to clientID

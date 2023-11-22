@@ -38,10 +38,22 @@ class HOAStryngS:
     def __nonBlockingRecieveFrom(self, connectionSocket):
         # the connectionSocket was set to non-blocking earlier
         connectionSocket.setblocking(0)
-        packet = connectionSocket.recv(1024).decode()
+        #packet = connectionSocket.recv(1024).decode()
+
+        num = 0
+        packet = ""
+
+        try:
+            packet = connectionSocket.recv(1024).decode()
+        except:
+            #do nothing
+            num += 1
+            
+
 
         # if connection didnt send anything return none
         if len(packet) == 0:
+            connectionSocket.setblocking(1)
             return None
 
         # while we have yet to get the end of the packet
