@@ -24,8 +24,13 @@ class game:
 
     # round status methods...
     def startNewRound(self):
+        # switch who is guessing
 
+        # reset game variables
         self.word = None
+        self.censoredWord = None
+        self.numIncorrectGuesses = 0
+        self.roundNumber = 0
         #end startNewRound()
 
 

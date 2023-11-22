@@ -17,19 +17,22 @@ class hangmanClient:
         # Phase 1 : Join/Create, (all before first guess)
         self.setup()
         
-        self.mainMenu()
+
+        while self.mainMenu():
+            loop = "forever"
+
         # Phase 2: actually playing the game.
 
 
-
+        
         # Phase 3: Catching player at end of game.
         
              
 
 
 
-    
-    #end hangman client
+        self.net.unregister()
+        #end client
 
 
     def setup(self):
@@ -63,6 +66,7 @@ class hangmanClient:
         print("1 - Create a new Game")
         print("2 - Find a game to join (list games)")
         print("3 - Join an existing game")
+        print("4 - Disconnect from server (unregister)")
 
         option = int(input("Enter option number: "))
         
@@ -72,24 +76,51 @@ class hangmanClient:
             self.listGame()
         elif option == 3:
             self.joinGame()
+        elif option == 4:
+            return False
         else:
             print("you done goofed, try again")
+
+        return True
         #end joinGame
 
 
 
     def createGame(self):
         print("option 1")
+        response = self.net.createNewGame()
+        statusCode = response["Status Code"]
+        
+        
+        if statusCode == "20":
+            print("play game")
+        else:
+            print("could not create game")
         #end create game
 
 
     def listGame(self):
         print("option 2")
+        response = self.net.requestGamesList()
+        statusCode = response["Status Code"]
+
+        if(statusCode == "20"):
+            print("play game")
+        else:
+            print("unexpected error")
         #end create game
 
 
     def joinGame(self):
         print("option 3")
+        gameID = int(input("Enter gameID: "))
+        response = self.net.joinGame(gameID)
+        statusCode = response["Status Code"]
+        
+        if statusCode == "20":
+            print("play game")
+        else:
+            print("could not join game " + str(gameID))
         #end create game
     
     

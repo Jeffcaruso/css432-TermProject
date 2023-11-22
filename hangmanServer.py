@@ -144,7 +144,7 @@ class hangmanServer:
         if clientID in self.clientIDToGameID.keys():
             gameID = self.clientIDToGameID[clientID]
             self.gameIDtoGame[gameID].removePlayer(clientID)
-            if self.gameIDtoGame[gameID].numPlayers() == 0:
+            if self.gameIDtoGame[gameID].getNumPlayers() == 0:
                 del self.gameIDtoGame[gameID]
             del self.clientIDToGameID[clientID]
         
