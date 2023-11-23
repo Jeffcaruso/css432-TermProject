@@ -11,7 +11,6 @@ class hangmanClient:
 
     
 
-
     def client(self):
         #def client(self, serverName, serverPort):
         self.printHangmanDisplay(0)
@@ -23,16 +22,8 @@ class hangmanClient:
         while self.mainMenu():
             loop = "forever"
 
-        # Phase 2: actually playing the game.
-
-
-        
-        # Phase 3: Catching player at end of game.
         
              
-
-
-
         self.net.unregister()
         #end client
 
@@ -134,7 +125,6 @@ class hangmanClient:
     def playGame(self, IAmGuesser):
         if(IAmGuesser):
             self.playGuesser()
-             
         else:
             self.playSelector()
         #end playGame
@@ -232,8 +222,9 @@ def main():
     client.client()
     #end main  
 
-main()
-#do NOT remove the main() in the line above
+
+if __name__ == "__main__":
+         main()
 
 
 
