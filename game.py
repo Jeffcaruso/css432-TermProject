@@ -1,14 +1,18 @@
-### game class...
-
-# win/loss  - determine from word vs censored word, use a gameWon() method, and hangman state
-# InProgress/OtherPlayerQuit
-
 
 class game:
+    """A hangman game class that keeps track of the current status of 
+    a game of hangman
+
+    Args:
+        gameID (int): the unique id associated with this game
+    """
+    
+    # Game constants 
     NUM_ROUNDS_TILL_LOSE = 6
     MAX_PLAYERS = 2
 
-    def __init__(self, gameID):
+
+    def __init__(self, gameID : int):
         #generally staying the same once filled *except score, increasing over multiple rounds*
         self.gameID = gameID
         self.clientIDtoScore = dict()
@@ -21,8 +25,11 @@ class game:
         self.roundNumber = 0
         #end init
     
+    
+    ###############################################
+    # Main Gameplay Logic Methods 
+    ###############################################
 
-    # round status methods
     def startNewRound(self):
         # switch who is guessing
         for client in self.clientIDtoScore.keys():
@@ -33,11 +40,39 @@ class game:
         self.word = None
         self.censoredWord = None
         self.numIncorrectGuesses = 0
-        self.roundNumber = 0
+        self.roundNumber = self.roundNumber + 1
         #end startNewRound()
 
 
+    # word status methods 
+    #NOTE: still need to decide how points will work and 
+    # and add that processing in here 
+    def processGuessLetter(self, letter : str):
+        # if round has been won or lost, don't update anything
+        if not self.roundInProgress():
+            return False
+        
+        # if letter is in word, reveal those letters
+        letter = letter.lower()
+        if letter in self.word:
+            index = 0
+            for char in self.word:
+                if char == letter:
+                    letterWasInWord = True
+                    self.censoredWord[index] = letter
+                index = index + 1
+            return True
+        # otherwise increment incorrect guesses
+        else: 
+            self.numIncorrectGuesses = self.numIncorrectGuesses + 1
+            return False
+        #end processGuessLetter
+
+
+    ###############################################
     # round status methods 
+    ###############################################
+    
     def roundWon(self): # word found
         return ((self.word is not None) and (self.word == self.censoredWord))
         #end roundWon()
@@ -51,10 +86,17 @@ class game:
     def roundInProgress(self):
         return (not (self.roundWon() or self.roundLost()) and self.word is not None)
         #end roundInProgres()
-
-
-
-    # word status methods 
+        
+        
+    def getNumIncorrectGuesses(self):
+        return self.getNumIncorrectGuesses
+        #end getNumIncorrectGuesses
+        
+    
+    ###############################################
+    # Game Word methods 
+    ###############################################
+    
     def getWord(self):
         return self.word
         #end getWord
@@ -83,14 +125,16 @@ class game:
         #end setWord
 
 
-
     def getCensoredWord(self):
         return self.censoredWord
         #end getCensoredWord
     
 
 
-    # get player status method
+    ###############################################
+    # game Player Methods
+    ###############################################
+
     def getNumPlayers(self):
         return len(self.clientIDtoScore.keys())
         #end getNumPlayers
@@ -128,5 +172,10 @@ class game:
     def setGuesser(self, clientID):
         self.guesser = clientID
         #end setGuesser
+        
+        
+    def getScore(self, clientID): 
+        return self.clientIDtoScore[clientID]
+        #end getScore
 
     #end of game class
