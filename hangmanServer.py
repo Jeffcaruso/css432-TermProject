@@ -209,14 +209,12 @@ class hangmanServer:
             word = selectWordRequest["Data"]
             game.setWord(word)
             #ack
-            #####self.net.sendDataToClient(clientID, "20", "OK")
             censoredWord = game.getCensoredWord()
             #collect, then send dictionary of info
             info = {
                 "Censored Word" : censoredWord,
                 "Incorrect Guesses" : 0
             }
-            
             self.net.sendDataToClient(clientID, "20", "OK", info)
 
             return
