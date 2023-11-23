@@ -44,15 +44,14 @@ class hangmanServer:
         print("got to processList")
 
         #NOTE, these need to be gameID, username
-        # gameList = {1 : "usernameA",  2 : "usernameB" } 
         gameList = list()
         #gameID, username1, username2
 
         for gameID in self.gameIDtoGame.keys():
             game = self.gameIDtoGame[gameID]
             usernames = list()
-            for clientID in game.clientIDtoScore:
-                usernames.append(self.clientIDToUsername[clientID])
+            for client in game.clientIDtoScore:
+                usernames.append(self.clientIDToUsername[client])
             
             gameInfo = {
                 "gameID" : gameID,
@@ -234,7 +233,15 @@ class hangmanServer:
             
             #if new ID was created, save it
             if(newClientID != -1):  ##is not None):
-                self.clientIDToUsername[newClientID] = "" 
+                newRequest = None
+                while (newRequest is None):
+                    newRequest = self.net.pollClientForRequest(newClientID)
+
+                newRequestMethodType = newRequest["Method Type"]
+                if (newRequestMethodType == "REGI"):
+                    self.__processRegister(newClientID, newRequest)
+                else:
+                    self.net.removeClient(newClientID)
 
 
             #get client list            
@@ -250,10 +257,10 @@ class hangmanServer:
 
 
                 # call the approperiate processing helper method
-                if(newRequestMethodType == "REGI"):
-                    self.__processRegister(clientID, newRequest)
+                # if(newRequestMethodType == "REGI"):
+                #     self.__processRegister(clientID, newRequest)
 
-                elif(newRequestMethodType == "LIST"):
+                if(newRequestMethodType == "LIST"):
                     self.__processList(clientID)
 
                 elif(newRequestMethodType == "CREA"):

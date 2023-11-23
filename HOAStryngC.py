@@ -104,6 +104,7 @@ class HOAStryngC:
         # send the packet and return result 
         response =  self.__sendRequestAndReturnResponse(packet)
         if response["Status Code"] != "20":
+            print("bad response!")
             self.clientSocket.close()
 
         return response

@@ -28,6 +28,7 @@ class HOAStryngS:
 
     def __sendToSocket(self, clientID, packet):
         # send the packet to the proper client connection
+        print("Sent message to: " + str(clientID))
         self.activeClientConnections[clientID].send(packet.encode())      
         #end of sendToSocket
 
@@ -36,7 +37,7 @@ class HOAStryngS:
     # returns the packet read, or none if the connection
     # has not sent anything to this socket
     def __nonBlockingRecieveFrom(self, connectionSocket):
-        # the connectionSocket was set to non-blocking earlier
+        # set the connectionSocket to non-blocking
         connectionSocket.setblocking(0)
 
         packet = ""
@@ -146,7 +147,8 @@ class HOAStryngS:
 
         #methodType[0] is method Type
         if methodType[0] not in self.ACCEPTED_METHOD_TYPES:
-            self.__sendToSocket((self.PROTOCOL_HEADER + "40 " + "Invalid Method Type\n" + self.DELIM))
+            packet = self.PROTOCOL_HEADER + "40 " + "Invalid Method Type\n" + self.DELIM
+            self.__sendToSocket(clientID, packet)
             return None; 
 
         # call parser to parse the packet 

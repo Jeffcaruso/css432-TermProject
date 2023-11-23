@@ -53,7 +53,7 @@ class hangmanClient:
 
         while(statusCode != "20"):
             print("MADE IT HERE - 7")
-            print("Enter a unique username (up to 20 characters)")
+            userName = input("Enter a unique username (up to 20 characters)")
             response = self.net.register(serverName, serverPort, userName)
             statusCode = response["Status Code"]
             #end while
@@ -136,12 +136,18 @@ class hangmanClient:
         print("Playing the game")
         #end playGame
 
+
     def printHangmanDisplay(self, numIncorrectGuesses):
-        f = open('hangmanDisplay/0IncorrectGuesses.txt', 'r')
+        if numIncorrectGuesses > 6:
+            numIncorrectGuesses = 6
+
+        filepath = 'hangmanDisplay/' + str(numIncorrectGuesses) + 'IncorrectGuesses.txt'
+        f = open(filepath, 'r')
         file_contents = f.read()
         print (file_contents)
         f.close()
         #end printHangmanDisplay
+
 
 def main():
     client = hangmanClient()
