@@ -22,9 +22,12 @@ class game:
         #end init
     
 
-    # round status methods...
+    # round status methods
     def startNewRound(self):
         # switch who is guessing
+        for client in self.clientIDtoScore.keys():
+            if self.getGuesser != client:
+                self.setGuesser = client
 
         # reset game variables
         self.word = None
@@ -34,7 +37,7 @@ class game:
         #end startNewRound()
 
 
-    # round status methods NOTE: this doesnt work becuase " " vs "_" 
+    # round status methods 
     def roundWon(self): # word found
         return ((self.word is not None) and (self.word == self.censoredWord))
         #end roundWon()
@@ -58,20 +61,27 @@ class game:
 
 
     def setWord(self, word: str):
-        self.word = word.lower()
+        word = word.lower()
         
+        #censored word
         cWord = ""
+        #modified word (lowercase and with "_" instead of " ")
+        mWord = ""
         
         for char in self.word:
             #" " -> _            
             if char == " ":
                 cWord += "_"
+                mWord += "_"
             #a-z,A-z,0-9, etc. -> *
             else:
                 cWord += "*"
+                mWord += char
 
         self.censoredWord = cWord
+        self.word = mWord
         #end setWord
+
 
 
     def getCensoredWord(self):
