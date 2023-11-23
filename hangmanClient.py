@@ -1,4 +1,5 @@
 import sys
+import time
 from HOAStryngC import HOAStryngC
 
 
@@ -131,10 +132,42 @@ class hangmanClient:
     
     
     def playGame(self, IAmGuesser):
+        if(IAmGuesser):
+            print("Waiting for other player to enter a word for you to guess")
+            response = self.net.initGuesser()
+            while(response["Status Code"] != "20"):
+                #wait for the selector
+                print("wait...")
+                time.sleep(2.5)
+                response = self.net.initGuesser()
+
+            print(response)
 
 
-        print("Playing the game")
+            #game menu
+            #1 - Guess a Letter
+            #2 - Exit this game
+            
+            
+             
+        else:
+            word = input("Enter a word for the other player to guess:")
+            response = self.net.selectWord(word)
+            while(response["Status Code"] != "20"):
+                #try again
+                print(response)
+                word = input("Enter a word for the other player to guess:")
+                response = self.net.selectWord(word)
+
+            print(response)
+            #game menu
+            #1 - Stay
+            #2 - Exit this game
+
+        
         #end playGame
+
+
 
 
     def printHangmanDisplay(self, numIncorrectGuesses):

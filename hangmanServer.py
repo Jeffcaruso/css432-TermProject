@@ -194,12 +194,57 @@ class hangmanServer:
     
 
     def __processSelectWord(self, clientID, selectWordRequest):
-        print(clientID)
+        
+        # validate if they can select a word (not the guesser, game is not in progress)
+        if clientID not in self.clientIDToGameID.keys():
+            self.net.sendDataToClient(clientID, "42", "Illegal Request")
+            
+        gameID = self.clientIDToGameID[clientID]
+        game = self.gameIDtoGame[gameID]
+
+        #NOTE: this breaks it: and not game.roundInProgress()
+        if ((clientID != game.getGuesser()) and (not game.roundInProgress())):
+            # you are allowed to set the word
+            # decide if word is valid - for now just accept all
+            word = selectWordRequest["Data"]
+            game.setWord(word)
+            #ack
+            self.net.sendDataToClient(clientID, "20", "OK")
+            return
+            
+        #nak
+        self.net.sendDataToClient(clientID, "42", "Illegal Request")
         #end __processList
 
 
     def __processInitGuesser(self, clientID, initGuesserRequest):
-        print(clientID)
+        #check that the client is actually in a game
+        if clientID not in self.clientIDToGameID.keys():
+            self.net.sendDataToClient(clientID, "42", "Illegal Request")
+            return
+        
+        gameID = self.clientIDToGameID[clientID]
+        game = self.gameIDtoGame[gameID]
+
+        # check that they are actually a guesser 
+        if clientID != game.getGuesser():
+            self.net.sendDataToClient(clientID, "42", "Illegal Request")
+            return
+
+        # get censored word
+        censoredWord = game.getCensoredWord()
+
+        if censoredWord is None:
+            self.net.sendDataToClient(clientID, "35", "Wait")
+            return 
+
+        #collect, then send dictionary of info
+        info = {
+            "Censored Word" : censoredWord,
+            "Incorrect Guesses" : 0
+        }
+        
+        self.net.sendDataToClient(clientID, "20", "OK", info)
         #end __processList
 
 
@@ -279,7 +324,7 @@ class hangmanServer:
                 elif(newRequestMethodType == "GUEL"):
                     self.__processGuessWord(clientID, newRequest)
 
-                elif(newRequestMethodType == "SELW"):
+                elif(newRequestMethodType == "SLWD"):
                     self.__processSelectWord(clientID, newRequest)
 
                 elif(newRequestMethodType == "INIG"):

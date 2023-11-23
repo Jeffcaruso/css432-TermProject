@@ -34,9 +34,9 @@ class game:
         #end startNewRound()
 
 
-    # round status methods
+    # round status methods NOTE: this doesnt work becuase " " vs "_" 
     def roundWon(self): # word found
-        return self.word == self.censoredWord
+        return ((self.word is not None) and (self.word == self.censoredWord))
         #end roundWon()
     
 
@@ -46,7 +46,7 @@ class game:
     
 
     def roundInProgress(self):
-        return not (self.roundWon() or self.roundLost())
+        return (not (self.roundWon() or self.roundLost()) and self.word is not None)
         #end roundInProgres()
 
 
@@ -55,6 +55,23 @@ class game:
     def getWord(self):
         return self.word
         #end getWord
+
+
+    def setWord(self, word: str):
+        self.word = word.lower()
+        
+        cWord = ""
+        
+        for char in self.word:
+            #" " -> _            
+            if char == " ":
+                cWord += "_"
+            #a-z,A-z,0-9, etc. -> *
+            else:
+                cWord += "*"
+
+        self.censoredWord = cWord
+        #end setWord
 
 
     def getCensoredWord(self):
