@@ -10,8 +10,8 @@ class HOAStryngC:
     # funtions
 
     def __init__(self):
-        #self.__prepSocket(hostName, portNumber)
-        print("init")
+        init = True
+        #end init
 
     # set up socket 
     def __prepSocket(self, hostName, portNumber):

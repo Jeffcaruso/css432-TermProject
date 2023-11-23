@@ -10,25 +10,42 @@ class hangmanClient:
         #end init
 
     
-
     def client(self):
-        #def client(self, serverName, serverPort):
-        self.printHangmanDisplay(0)
-        
         # Phase 1 : Join/Create, (all before first guess)
-        self.setup()
+        stillPlaying = True
+        while stillPlaying:
+            stillPlaying = self.startMenu()
         
-
-        while self.mainMenu():
-            loop = "forever"
-
-        
-             
-        self.net.unregister()
+            stillRegisteredWithServer = True
+            while stillPlaying and stillRegisteredWithServer :
+                stillRegisteredWithServer = self.mainMenu()
         #end client
 
 
-    def setup(self):
+    def startMenu(self):
+        print("Welcome To Hangman")
+        self.printHangmanDisplay(0)
+        print()
+        print("Select an option from this list (enter the #)")
+        print("1 - Join a Server (Register)")
+        print("2 - Quit (Stop Playing)")
+        
+        try:
+            option = int(input("Enter option number: "))
+        except:
+            option = -1
+        
+        if option == 1:
+            self.connectToAServer()
+            return True
+        elif option == 2:
+            return False    
+        else:
+            print("you done goofed, try again")
+        #end startMenu 
+        
+
+    def connectToAServer(self):
         # Register
         print("*** Register ***")
         serverName = input("Enter server hostname: ")
@@ -73,6 +90,7 @@ class hangmanClient:
         elif option == 3:
             self.joinGame()
         elif option == 4:
+            self.net.unregister()
             return False
         else:
             print("you done goofed, try again")

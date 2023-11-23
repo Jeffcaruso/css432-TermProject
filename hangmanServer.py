@@ -365,4 +365,5 @@ def main():
     server.server()
     #endmain
     
-main()
+if __name__ == "__main__":
+         main()
