@@ -156,6 +156,7 @@ class game:
 
 
     def removePlayer(self, clientID):
+        # check if client is in the game 
         if clientID not in self.clientIDtoScore.keys():
             return False
         

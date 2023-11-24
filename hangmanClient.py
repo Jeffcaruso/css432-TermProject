@@ -7,22 +7,24 @@ class hangmanClient:
 
     def __init__(self):
         self.net = HOAStryngC()
+        self.registeredWithServer = False
         #end init
 
     
     def client(self):
-        # Phase 1 : Join/Create, (all before first guess)
+        # loop and keep showing the start menu till player decides to quit
         stillPlaying = True
         while stillPlaying:
             stillPlaying = self.startMenu()
         
-            stillRegisteredWithServer = True
-            while stillPlaying and stillRegisteredWithServer :
-                stillRegisteredWithServer = self.mainMenu()
+            #loop and keep showing main menu till user decides to unregister 
+            while stillPlaying and self.registeredWithServer :
+                self.mainMenu()
         #end client
 
 
     def startMenu(self):
+        # main menu options 
         print("Welcome To Hangman")
         self.printHangmanDisplay(0)
         print()
@@ -30,45 +32,58 @@ class hangmanClient:
         print("1 - Join a Server (Register)")
         print("2 - Quit (Stop Playing)")
         
+        # poll user for their choice  
         try:
             option = int(input("Enter option number: "))
+            print()
         except:
             option = -1
         
+        # act based on their choice 
         if option == 1:
             self.connectToAServer()
-            return True
         elif option == 2:
             return False    
         else:
-            print("you done goofed, try again")
+            print("Option not supported")
+        return True
         #end startMenu 
         
 
     def connectToAServer(self):
-        # Register
-        print("*** Register ***")
+        # get regisitration info from user 
         serverName = input("Enter server hostname: ")
-        serverPort = int(input("Enter server port: "))
-        userName = input("Enter your userName: ")
+        serverPort = -1
+        while serverPort < 0: 
+            try:
+                serverPort = int(input("Enter server port: "))
+            except:
+                print("server port needs to be an number")
+                
+        userName = input("Enter your display name: ")
+        print()
 
-
-        response = self.net.register(serverName, serverPort, userName)
-        statusCode = response["Status Code"]
-        #NOTE: ask if it is fine to crash when invalid port/server name is given
-        print(statusCode)
-
-        print("MADE IT HERE - 5")
-
-        while(statusCode != "20"):
-            print("MADE IT HERE - 7")
-            userName = input("Enter a unique username (up to 20 characters)")
+        # if we can connect to the server 
+        try:
+            # keep trying to register till the user enters a unique name
             response = self.net.register(serverName, serverPort, userName)
             statusCode = response["Status Code"]
-            #end while
-
-        print("MADE IT HERE - 10")
-        # end setup()
+            
+            while(statusCode != "20"):
+                print("Display name already taken")
+                userName = input("Enter a new display name (up to 20 characters):")
+                response = self.net.register(serverName, serverPort, userName)
+                print()
+                statusCode = response["Status Code"]
+                #end while
+                
+            print("Registration Successful")
+            print()   
+            self.registeredWithServer = True
+        except:
+            print("Could not connect to a server with that hostname/port")
+            print()
+        # end connectToAServer()
 
 
     def mainMenu(self):
@@ -80,6 +95,7 @@ class hangmanClient:
 
         try:
             option = int(input("Enter option number: "))
+            print()
         except:
             option = -1
 
@@ -91,11 +107,9 @@ class hangmanClient:
             self.joinGame()
         elif option == 4:
             self.net.unregister()
-            return False
+            self.registeredWithServer = False
         else:
-            print("you done goofed, try again")
-
-        return True
+            print("Option not supported")
         #end joinGame
 
 
@@ -150,12 +164,37 @@ class hangmanClient:
 
     def playGuesser(self):
         print("Waiting for other player to enter a word for you to guess")
+        
+        numWaitCyclesSinceChecked = 0
         response = self.net.initGuesser()
         while(response["Status Code"] != "20"):
             #wait for the selector
             print("wait...")
             time.sleep(2.5)
-            response = self.net.initGuesser()
+            numWaitCyclesSinceChecked += 1
+            
+            # if they have been waiting a while give them a chance to leave
+            # the game
+            if (numWaitCyclesSinceChecked > 10):
+                print("Select an option from this list (enter the #)")
+                print("1 - Keep Waiting")
+                print("2 - Exit this game")
+            
+                try:
+                    option = int(input("Enter option number: "))
+                    print()
+                except:
+                    option = -1
+                
+                if option == 1:
+                    numWaitCyclesSinceChecked = 0
+                elif option == 2:
+                    return
+                else:
+                    print("Option not supported")
+                
+            response = self.net.initGuesser()     
+        #end wait loop
 
         numIncorrectGuesses = response["Data"]["Incorrect Guesses"]
         censoredWord = response["Data"]["Censored Word"]
@@ -163,12 +202,14 @@ class hangmanClient:
         while True:
             self.printHangmanDisplay(numIncorrectGuesses)
             print(censoredWord)
+            print()
             print("Select an option from this list (enter the #)")
             print("1 - Guess a Letter")
             print("2 - Exit this game")
             
             try:
                 option = int(input("Enter option number: "))
+                print()
             except:
                 option = -1
 
@@ -177,7 +218,7 @@ class hangmanClient:
             elif option == 2:
                 print("exiting")
             else:
-                print("you done goofed, try again")
+                print("Option not supported")
 
         #end playGuesser
 
@@ -193,24 +234,31 @@ class hangmanClient:
             word = input("Enter a word for the other player to guess:")
             response = self.net.selectWord(word)
 
-        print(response)
-        numIncorrectGuesses = 0
+
+        numIncorrectGuesses = response["Data"]["Incorrect Guesses"]
+        censoredWord = response["Data"]["Censored Word"]
 
         while True:
             #game menu
-            self.printHangmanDisplay(numIncorrectGuesses) #response["Data"]["Incorrect Guesses"]
-            censoredWord = response["Data"]["Censored Word"]
+            self.printHangmanDisplay(numIncorrectGuesses) 
             print(censoredWord)
+            print()
             print("Select an option from this List:")
             print("1 - Stay")
             print("2 - Exit this game")
 
-            selection = int(input("Enter selection:"))
+            try:
+                option = int(input("Enter option number: "))
+                print()
+            except:
+                option = -1
 
-            if selection == 2:
-                #exit
-                print("exit")
-
+            if option == 1:
+                print("Waiting for other Player")
+            elif option == 2:
+                print("exiting")
+            else:
+                print("Option not supported")
 
 
             #get updated game state
