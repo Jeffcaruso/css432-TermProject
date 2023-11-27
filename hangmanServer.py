@@ -122,6 +122,8 @@ class hangmanServer:
     
 
         joinInfo = dict()
+        joinInfo["GameID"] = gameID
+        
         #implicit guesser decision
         if self.gameIDtoGame[gameID].getGuesser() is None:
             #youre it
@@ -209,12 +211,8 @@ class hangmanServer:
             word = selectWordRequest["Data"]
             game.setWord(word)
             #ack
-            censoredWord = game.getCensoredWord()
-            #collect, then send dictionary of info
-            info = {
-                "Censored Word" : censoredWord,
-                "Incorrect Guesses" : 0
-            }
+            
+            info = game.getGameInfo(clientID)
             self.net.sendDataToClient(clientID, "20", "OK", info)
 
             return
@@ -246,10 +244,7 @@ class hangmanServer:
             return 
 
         #collect, then send dictionary of info
-        info = {
-            "Censored Word" : censoredWord,
-            "Incorrect Guesses" : 0
-        }
+        info = game.getGameInfo(clientID)
         
         self.net.sendDataToClient(clientID, "20", "OK", info)
         #end __processList
@@ -309,8 +304,9 @@ class hangmanServer:
 
 
                 # call the approperiate processing helper method
-                # if(newRequestMethodType == "REGI"):
-                #     self.__processRegister(clientID, newRequest)
+                # (register gets checked for above)
+                if(newRequestMethodType == "UNRG"):
+                    self.__processUnregister(clientID, newRequest)
 
                 if(newRequestMethodType == "LIST"):
                     self.__processList(clientID)
@@ -324,18 +320,15 @@ class hangmanServer:
                 elif(newRequestMethodType == "EXIT"):
                     self.__processExit(clientID, newRequest)
 
-                elif(newRequestMethodType == "UNRG"):
-                    self.__processUnregister(clientID, newRequest)
-
                 # game specific processing below
-                elif(newRequestMethodType == "GUEL"):
-                    self.__processGuessWord(clientID, newRequest)
-
                 elif(newRequestMethodType == "SLWD"):
                     self.__processSelectWord(clientID, newRequest)
-
+                    
                 elif(newRequestMethodType == "INIG"):
                     self.__processInitGuesser(clientID, newRequest)
+            
+                elif(newRequestMethodType == "GUEL"):
+                    self.__processGuessWord(clientID, newRequest)
 
                 elif(newRequestMethodType == "AKGS"):
                     self.__processAskGameState(clientID, newRequest)
@@ -366,4 +359,4 @@ def main():
     #endmain
     
 if __name__ == "__main__":
-         main()
+    main()

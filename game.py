@@ -67,6 +67,31 @@ class game:
             self.numIncorrectGuesses = self.numIncorrectGuesses + 1
             return False
         #end processGuessLetter
+        
+    #NOTE: this needs to be modified to give username to points, not 
+    # client id to points
+    def getGameInfo(self, clientID):
+        if (self.word == None):
+            gameState = "INIT"
+        elif (self.roundWon()):
+            gameState = "WON"
+        elif (self.roundLost()):
+            gameState = "LOST"
+        else:
+            gameState = "IN_PROGRESS"
+        
+        gameInfo = {
+            "GameID" : self.gameID,
+            "Num Players" : self.getNumPlayers(),
+            "You Are Guesser" : bool(self.guesser == clientID),
+            "Censored Word" : self.censoredWord,
+            "Incorrect Guesses" : self.numIncorrectGuesses,
+            "Game State" : str(gameState),
+            "Player To Score" : self.clientIDtoScore
+        }
+        
+        return gameInfo
+        #end getGameState
 
 
     ###############################################
@@ -110,7 +135,7 @@ class game:
         #modified word (lowercase and with "_" instead of " ")
         mWord = ""
         
-        for char in self.word:
+        for char in word:
             #" " -> _            
             if char == " ":
                 cWord += "_"

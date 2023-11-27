@@ -196,6 +196,8 @@ class hangmanClient:
             response = self.net.initGuesser()     
         #end wait loop
 
+        print(response)
+        
         numIncorrectGuesses = response["Data"]["Incorrect Guesses"]
         censoredWord = response["Data"]["Censored Word"]
 
@@ -234,7 +236,7 @@ class hangmanClient:
             word = input("Enter a word for the other player to guess:")
             response = self.net.selectWord(word)
 
-
+        print(response)
         numIncorrectGuesses = response["Data"]["Incorrect Guesses"]
         censoredWord = response["Data"]["Censored Word"]
 
@@ -290,7 +292,7 @@ def main():
 
 
 if __name__ == "__main__":
-         main()
+    main()
 
 
 
