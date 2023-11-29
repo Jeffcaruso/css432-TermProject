@@ -55,12 +55,17 @@ class game:
         # if letter is in word, reveal those letters
         letter = letter.lower()
         if letter in self.word:
+            newCensoredWord = ""
             index = 0
             for char in self.word:
                 if char == letter:
-                    self.censoredWord[index] = letter
-                index = index + 1
+                    newCensoredWord += letter
+                else:
+                    newCensoredWord += self.censoredWord[index]
+                index += 1
+            self.censoredWord = newCensoredWord
             return True
+        
         # otherwise increment incorrect guesses
         else: 
             self.numIncorrectGuesses = self.numIncorrectGuesses + 1

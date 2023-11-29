@@ -280,19 +280,9 @@ class hangmanServer:
         #end __processList
 
 
-    def __processGetMyPoints(self, clientID, getMyPointsRequest):
-        print(clientID)
-        #end __GetMyPoints
-
-
-    def __processGetOpponentPoints(self, clientID, getOpponentPointsRequest):
-        print(clientID)
-        #end __GetOpponentPoints
-
-
     def __processGetScoreBoard(self, clientID, getScoreBoardRequest):
         print(clientID)
-        #end __processList
+        #end __processGetScoreBoard
 
 
 
@@ -333,7 +323,7 @@ class hangmanServer:
                 if(newRequestMethodType == "UNRG"):
                     self.__processUnregister(clientID, newRequest)
 
-                if(newRequestMethodType == "LIST"):
+                elif(newRequestMethodType == "LIST"):
                     self.__processList(clientID)
 
                 elif(newRequestMethodType == "CREA"):
@@ -358,18 +348,13 @@ class hangmanServer:
                 elif(newRequestMethodType == "AKGS"):
                     self.__processAskGameState(clientID, newRequest)
 
-                elif(newRequestMethodType == "GMPT"):
-                    self.__processGetMyPoints()
-                
-                elif(newRequestMethodType == "GOPT"):
-                    self.__processGetOpponentPoints()
-
                 elif(newRequestMethodType == "GTSB"):
                     self.__processGetScoreBoard(clientID, newRequest)
 
                 else:
                     #unexpected to reach here because HOAStryngS should have it filtered out.
-                    print("Something went wrong with a recent recieved request (Malformed Request)")                
+                    print("Something went wrong with a recent recieved request (Malformed Request)")      
+                    print(newRequest)          
                 #end for                    
         #end server
 

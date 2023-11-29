@@ -8,7 +8,7 @@ import json
 class HOAStryngS:
     DELIM = "~~~~~~()"
     PROTOCOL_HEADER = "HOAS/1.0 "
-    ACCEPTED_METHOD_TYPES = {"REGI", "LIST", "CREA", "JOIN", "EXIT", "UNRG", "GUEL", "SLWD", "INIG", "AKGS", "GTMP", "GOPT", "GTSB" }
+    ACCEPTED_METHOD_TYPES = {"REGI", "LIST", "CREA", "JOIN", "EXIT", "UNRG", "GUEL", "SLWD", "INIG", "AKGS", "GTSB" }
 
 
     def __init__(self, serverPort):

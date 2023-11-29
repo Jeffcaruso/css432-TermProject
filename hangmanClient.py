@@ -192,6 +192,7 @@ class hangmanClient:
                 if option == 1:
                     numWaitCyclesSinceChecked = 0
                 elif option == 2:
+                    response = self.net.exitGame()
                     return
                 else:
                     print("Option not supported")
@@ -235,22 +236,21 @@ class hangmanClient:
             else:
                 print("Option not supported")
 
+        self.printHangmanDisplay(numIncorrectGuesses)
+        print(censoredWord)
 
         if gameState == "WON":
             print("You Won!")
             print()
             time.sleep(2)            
-            response = self.net.exitGame()
 
         if gameState == "LOST":
             print("You lost")
             print()
             time.sleep(2)            
-            response = self.net.exitGame()
-        #end playGuesser
-        #end playGuesser
 
-
+        response = self.net.exitGame()
+        #end playGuesser
 
 
     def playSelector(self):
@@ -275,32 +275,37 @@ class hangmanClient:
                 self.printHangmanDisplay(numIncorrectGuesses) 
                 print(censoredWord)
                 print()
-            # save old g
+
+            # save old game state 
             oldCensoredWord = censoredWord
             oldNumIncorrectGuesses = numIncorrectGuesses
             oldNumIncorrectGuesses = numIncorrectGuesses
+
             # wait a bit, then get updated game state
             time.sleep(2.5)
             numWaitCyclesSinceChecked += 1
+            
             response = self.net.askGameState()
-            #
             numIncorrectGuesses = response["Data"]["Incorrect Guesses"]
             censoredWord = response["Data"]["Censored Word"]
             gameState = response["Data"]["Game State"]
+
+            # check if anything has changed 
             should_print_hangman = (oldCensoredWord != censoredWord) or (oldNumIncorrectGuesses != numIncorrectGuesses)
 
             if (numWaitCyclesSinceChecked > 10):
-                #game menu
+                #give them a chance to leave 
                 numWaitCyclesSinceChecked = 0
                 print("Select an option from this List:")
                 print("1 - Stay")
                 print("2 - Exit this game")
 
                 try:
-                    print("Enter option number:")
-                    option = select.select([sys.stdin], 2)
+                    print("Enter option number (you have 2 seconds):")
+                    option = int(select.select([sys.stdin], 2))
                     # option = int(input("Enter option number: "))
-                    # print()
+                    if option is None:
+                        option = 1
                 except:
                     option = -1
 
@@ -313,22 +318,24 @@ class hangmanClient:
                     return
                 else:
                     print("Option not supported")
-
-            
-            
             #otherwise, stay, so do nothing
+            #end of while
 
+        self.printHangmanDisplay(numIncorrectGuesses)
+        print(censoredWord)
+
+        #NOTE: win/lost in game state is based on if word was guessed. so for word selector, they are flipped.
         if gameState == "WON":
+            print("You Lost")
+            print()
+            time.sleep(2)            
+
+        if gameState == "LOST":
             print("You Won!")
             print()
             time.sleep(2)            
-            response = self.net.exitGame()
-
-        if gameState == "LOST":
-            print("You lost")
-            print()
-            time.sleep(2)            
-            response = self.net.exitGame()
+        
+        response = self.net.exitGame()
 
         #end playSelector
 
@@ -355,66 +362,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# # Register
-#         print("*** Register ***")
-#         response = self.net.register(serverName, serverPort,"this is a great username")
-#         statusCode = response["Status Code"]
-#         print(statusCode)
-
-#         print("here HC - 5")
-
-#         print("*** Register ***")
-#         response = self.net.register(serverName, serverPort, "this is a great username")
-#         statusCode = response["Status Code"]
-#         print(statusCode)
-
-#         print("*** List Games ***")
-#         games = self.net.requestGamesList()
-#         statusCode = games["Status Code"]
-#         print(statusCode)
-#         gamesList = games["Data"]
-#         print(gamesList.items())
-#         #end 
-
-
-#         Info = self.net.createNewGame()
-#         print("Create Game:")
-#         print("GameID: " + str(Info["Data"]["GameID"]))
-#         print("AreGuesser: " + str(Info["Data"]["You Are Guesser"]))
-
-
-#         Info2 = self.net.joinGame(Info["Data"]["GameID"])
-#         print("Join Game:")
-#         print("status code: " + Info2["Status Code"])
-#         print("AreGuesser: " + str(Info2["Data"]["You Are Guesser"]))
-
-#         Info3 = self.net.exitGame()
-#         print("exit Game:")
-#         print("status code: " + Info3["Status Code"])
-
-
-#         Info4 = self.net.unregister()
-#         print("unregister:")
-#         print("Status code: " + Info4["Status Code"])
