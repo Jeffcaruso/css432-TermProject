@@ -281,6 +281,7 @@ class hangmanClient:
             oldNumIncorrectGuesses = numIncorrectGuesses
             # wait a bit, then get updated game state
             time.sleep(2.5)
+            numWaitCyclesSinceChecked += 1
             response = self.net.askGameState()
             #
             numIncorrectGuesses = response["Data"]["Incorrect Guesses"]
@@ -290,6 +291,7 @@ class hangmanClient:
 
             if (numWaitCyclesSinceChecked > 10):
                 #game menu
+                numWaitCyclesSinceChecked = 0
                 print("Select an option from this List:")
                 print("1 - Stay")
                 print("2 - Exit this game")
