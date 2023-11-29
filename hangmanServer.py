@@ -190,13 +190,29 @@ class hangmanServer:
         #end __processList
 
 
-    def __processGuessWord(self, clientID, guessWordRequest):
-        print(clientID)
+    def __processGuessLetter(self, clientID, guessLetterRequest):
+        #check that the client is actually in a game
+        if clientID not in self.clientIDToGameID.keys():
+            self.net.sendDataToClient(clientID, "42", "Illegal Request")
+            return
+        
+        gameID = self.clientIDToGameID[clientID]
+        game = self.gameIDtoGame[gameID]
+
+        # check that they are actually a guesser 
+        if clientID != game.getGuesser():
+            self.net.sendDataToClient(clientID, "42", "Illegal Request")
+            return
+        
+        guessedLetter = guessLetterRequest["Data"]
+        game.processGuessLetter(guessedLetter)
+
+        info = game.getGameInfo(clientID)
+        self.net.sendDataToClient(clientID, "20", "OK", info)
         #end __processList
     
 
     def __processSelectWord(self, clientID, selectWordRequest):
-        
         # validate if they can select a word (not the guesser, game is not in progress)
         if clientID not in self.clientIDToGameID.keys():
             self.net.sendDataToClient(clientID, "42", "Illegal Request")
@@ -250,8 +266,17 @@ class hangmanServer:
         #end __processList
 
 
-    def __processAskGameState(self, clientID, askGameStateRequest):
-        print(clientID)
+    def __processAskGameState(self, clientID, askGameStateRequest):        
+        #check that the client is actually in a game
+        if clientID not in self.clientIDToGameID.keys():
+            self.net.sendDataToClient(clientID, "42", "Illegal Request")
+            return
+        
+        gameID = self.clientIDToGameID[clientID]
+        game = self.gameIDtoGame[gameID]
+        info = game.getGameInfo(clientID)
+
+        self.net.sendDataToClient(clientID, "20", "OK", info)
         #end __processList
 
 
@@ -328,7 +353,7 @@ class hangmanServer:
                     self.__processInitGuesser(clientID, newRequest)
             
                 elif(newRequestMethodType == "GUEL"):
-                    self.__processGuessWord(clientID, newRequest)
+                    self.__processGuessLetter(clientID, newRequest)
 
                 elif(newRequestMethodType == "AKGS"):
                     self.__processAskGameState(clientID, newRequest)

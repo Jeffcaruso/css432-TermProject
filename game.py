@@ -58,7 +58,6 @@ class game:
             index = 0
             for char in self.word:
                 if char == letter:
-                    letterWasInWord = True
                     self.censoredWord[index] = letter
                 index = index + 1
             return True

@@ -1,7 +1,10 @@
 import sys
 import time
 from HOAStryngC import HOAStryngC
-
+# Import the libraries inputimeout, TimeoutOccurred 
+# from inputimeout import inputimeout # Import the libraries inputimeout, TimeoutOccurred 
+# from inputimeout import inputimeout 
+import select
 
 class hangmanClient:
 
@@ -200,8 +203,10 @@ class hangmanClient:
         
         numIncorrectGuesses = response["Data"]["Incorrect Guesses"]
         censoredWord = response["Data"]["Censored Word"]
+        gameState = response["Data"]["Game State"]
 
-        while True:
+        #while True:
+        while gameState == "IN_PROGRESS":
             self.printHangmanDisplay(numIncorrectGuesses)
             print(censoredWord)
             print()
@@ -216,12 +221,33 @@ class hangmanClient:
                 option = -1
 
             if option == 1:
-                print("letter: ")
+                suppliedLetter = input("letter: ")
+                response = self.net.guessLetter(suppliedLetter) 
+                
+                numIncorrectGuesses = response["Data"]["Incorrect Guesses"]
+                censoredWord = response["Data"]["Censored Word"]
+                gameState = response["Data"]["Game State"]
+                
             elif option == 2:
                 print("exiting")
+                response = self.net.exitGame()
+                return
             else:
                 print("Option not supported")
 
+
+        if gameState == "WON":
+            print("You Won!")
+            print()
+            time.sleep(2)            
+            response = self.net.exitGame()
+
+        if gameState == "LOST":
+            print("You lost")
+            print()
+            time.sleep(2)            
+            response = self.net.exitGame()
+        #end playGuesser
         #end playGuesser
 
 
@@ -239,34 +265,68 @@ class hangmanClient:
         print(response)
         numIncorrectGuesses = response["Data"]["Incorrect Guesses"]
         censoredWord = response["Data"]["Censored Word"]
+        gameState = response["Data"]["Game State"]
+        numWaitCyclesSinceChecked = 0
+        should_print_hangman = True
 
-        while True:
-            #game menu
-            self.printHangmanDisplay(numIncorrectGuesses) 
-            print(censoredWord)
-            print()
-            print("Select an option from this List:")
-            print("1 - Stay")
-            print("2 - Exit this game")
-
-            try:
-                option = int(input("Enter option number: "))
+        while gameState == "IN_PROGRESS":
+            # print out game state
+            if (should_print_hangman):
+                self.printHangmanDisplay(numIncorrectGuesses) 
+                print(censoredWord)
                 print()
-            except:
-                option = -1
+            # save old g
+            oldCensoredWord = censoredWord
+            oldNumIncorrectGuesses = numIncorrectGuesses
+            oldNumIncorrectGuesses = numIncorrectGuesses
+            # wait a bit, then get updated game state
+            time.sleep(2.5)
+            response = self.net.askGameState()
+            #
+            numIncorrectGuesses = response["Data"]["Incorrect Guesses"]
+            censoredWord = response["Data"]["Censored Word"]
+            gameState = response["Data"]["Game State"]
+            should_print_hangman = (oldCensoredWord != censoredWord) or (oldNumIncorrectGuesses != numIncorrectGuesses)
 
-            if option == 1:
-                print("Waiting for other Player")
-            elif option == 2:
-                print("exiting")
-            else:
-                print("Option not supported")
+            if (numWaitCyclesSinceChecked > 10):
+                #game menu
+                print("Select an option from this List:")
+                print("1 - Stay")
+                print("2 - Exit this game")
 
+                try:
+                    print("Enter option number:")
+                    option = select.select([sys.stdin], 2)
+                    # option = int(input("Enter option number: "))
+                    # print()
+                except:
+                    option = -1
 
-            #get updated game state
+                if option == 1:
+                    print("Waiting for other Player")
+
+                elif option == 2:
+                    print("exiting")
+                    response = self.net.exitGame()
+                    return
+                else:
+                    print("Option not supported")
+
             
             
             #otherwise, stay, so do nothing
+
+        if gameState == "WON":
+            print("You Won!")
+            print()
+            time.sleep(2)            
+            response = self.net.exitGame()
+
+        if gameState == "LOST":
+            print("You lost")
+            print()
+            time.sleep(2)            
+            response = self.net.exitGame()
 
         #end playSelector
 
