@@ -336,10 +336,7 @@ class hangmanClient:
             time.sleep(2)            
         
         response = self.net.exitGame()
-
         #end playSelector
-
-
 
 
     def printHangmanDisplay(self, numIncorrectGuesses):
