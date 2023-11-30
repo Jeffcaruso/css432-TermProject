@@ -204,6 +204,13 @@ class hangmanServer:
             self.net.sendDataToClient(clientID, "42", "Illegal Request")
             return
         
+        #check that the game has a word
+        censoredWord = game.getCensoredWord()
+
+        if censoredWord is None:
+            self.net.sendDataToClient(clientID, "35", "Wait")
+            return 
+        
         guessedLetter = guessLetterRequest["Data"]
         game.processGuessLetter(guessedLetter)
 
@@ -220,7 +227,6 @@ class hangmanServer:
         gameID = self.clientIDToGameID[clientID]
         game = self.gameIDtoGame[gameID]
 
-        #NOTE: this breaks it: and not game.roundInProgress()
         if ((clientID != game.getGuesser()) and (not game.roundInProgress())):
             # you are allowed to set the word
             # decide if word is valid - for now just accept all
@@ -230,40 +236,11 @@ class hangmanServer:
             
             info = game.getGameInfo(clientID)
             self.net.sendDataToClient(clientID, "20", "OK", info)
-
             return
             
         #nak
         self.net.sendDataToClient(clientID, "42", "Illegal Request")
-        #end __processList
-
-
-    def __processInitGuesser(self, clientID, initGuesserRequest):
-        #check that the client is actually in a game
-        if clientID not in self.clientIDToGameID.keys():
-            self.net.sendDataToClient(clientID, "42", "Illegal Request")
-            return
-        
-        gameID = self.clientIDToGameID[clientID]
-        game = self.gameIDtoGame[gameID]
-
-        # check that they are actually a guesser 
-        if clientID != game.getGuesser():
-            self.net.sendDataToClient(clientID, "42", "Illegal Request")
-            return
-
-        # get censored word
-        censoredWord = game.getCensoredWord()
-
-        if censoredWord is None:
-            self.net.sendDataToClient(clientID, "35", "Wait")
-            return 
-
-        #collect, then send dictionary of info
-        info = game.getGameInfo(clientID)
-        
-        self.net.sendDataToClient(clientID, "20", "OK", info)
-        #end __processList
+        #end __processSelectWord
 
 
     def __processAskGameState(self, clientID, askGameStateRequest):        
@@ -277,7 +254,7 @@ class hangmanServer:
         info = game.getGameInfo(clientID)
 
         self.net.sendDataToClient(clientID, "20", "OK", info)
-        #end __processList
+        #end __processAskGameState
 
 
     def __processGetScoreBoard(self, clientID, getScoreBoardRequest):
@@ -338,9 +315,6 @@ class hangmanServer:
                 # game specific processing below
                 elif(newRequestMethodType == "SLWD"):
                     self.__processSelectWord(clientID, newRequest)
-                    
-                elif(newRequestMethodType == "INIG"):
-                    self.__processInitGuesser(clientID, newRequest)
             
                 elif(newRequestMethodType == "GUEL"):
                     self.__processGuessLetter(clientID, newRequest)

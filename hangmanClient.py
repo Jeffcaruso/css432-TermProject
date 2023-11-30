@@ -169,8 +169,8 @@ class hangmanClient:
         print("Waiting for other player to enter a word for you to guess")
         
         numWaitCyclesSinceChecked = 0
-        response = self.net.initGuesser()
-        while(response["Status Code"] != "20"):
+        response = self.net.askGameState()
+        while(response["Status Code"] != "20" or response["Data"]["Censored Word"] is None):
             #wait for the selector
             print("wait...")
             time.sleep(2.5)
@@ -179,25 +179,30 @@ class hangmanClient:
             # if they have been waiting a while give them a chance to leave
             # the game
             if (numWaitCyclesSinceChecked > 10):
+                numWaitCyclesSinceChecked = 0
                 print("Select an option from this list (enter the #)")
                 print("1 - Keep Waiting")
                 print("2 - Exit this game")
             
                 try:
-                    option = int(input("Enter option number: "))
-                    print()
+                    print("Enter option number (you have 5 seconds):")
+                    option = int(select.select([sys.stdin], [], [], 5))
+                    print(option)
+                    if option is None:
+                        option = 1
                 except:
                     option = -1
                 
                 if option == 1:
-                    numWaitCyclesSinceChecked = 0
+                    print("Waiting for other Player")
                 elif option == 2:
+                    print("exiting")
                     response = self.net.exitGame()
                     return
                 else:
                     print("Option not supported")
                 
-            response = self.net.initGuesser()     
+            response = self.net.askGameState()     
         #end wait loop
 
         print(response)
@@ -302,8 +307,8 @@ class hangmanClient:
 
                 try:
                     print("Enter option number (you have 2 seconds):")
-                    option = int(select.select([sys.stdin], 2))
-                    # option = int(input("Enter option number: "))
+                    option = int(select.select([sys.stdin], [], [], 5))
+                    print(option)
                     if option is None:
                         option = 1
                 except:
