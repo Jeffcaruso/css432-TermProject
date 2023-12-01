@@ -78,9 +78,10 @@ class HOAStryngS:
         #end of __nonBlockingRecieveFrom
 
 
-    # 
+    # turn a request packet into an easy to use dictornary that
+    # abstracts away the protocol
     def __parseRequestPacket(self, packet):
-        #Protocol_header + method_type + "\n" + requestData + delim
+        #Protocol_header + " " +  method_type + "\n" + request_data + delimiter 
         
         # first space is the end of the protocol header
         hdr = packet.split(" ", 1)

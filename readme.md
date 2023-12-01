@@ -24,12 +24,7 @@
 
 
 ## Documentation Links
-protocol documentation:
-https://docs.google.com/document/d/1NuUj9wqFaEueTtUwdIeYir1m1rvpkxbhUfHKuwzdIfk/edit?usp=sharing
-
-Instructions documentation:
-https://docs.google.com/document/d/1YsQWbQr7iAAnxoI-eDzS7lgPOox7n_Z11neOFjEYy0s/edit?usp=sharing 
-
-teamwork documentation::
-https://docs.google.com/document/d/1v2gizOdAToVRhrHxLdsfU4xikV7R00q2ZMuenxTqeo4/edit?usp=sharing
+- [protocol documentation](https://docs.google.com/document/d/1NuUj9wqFaEueTtUwdIeYir1m1rvpkxbhUfHKuwzdIfk/edit?usp=sharing)
+- [Instructions documentation](https://docs.google.com/document/d/1YsQWbQr7iAAnxoI-eDzS7lgPOox7n_Z11neOFjEYy0s/edit?usp=sharing)
+- [Teamwork documentation](https://docs.google.com/document/d/1v2gizOdAToVRhrHxLdsfU4xikV7R00q2ZMuenxTqeo4/edit?usp=sharing)
 

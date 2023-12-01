@@ -52,9 +52,11 @@ class HOAStryngC:
         #end of recieveFromSocket
 
 
-    # turn a packet into am easy to use dictornary that
+    # turn a response packet into am easy to use dictornary that
     # abstracts away the protocol
     def __processReturnedInfo(self, response):
+
+        
         # first space is the end of the protocol header
         hdr = response.split(" ", 1)
         
