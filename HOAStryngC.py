@@ -55,8 +55,9 @@ class HOAStryngC:
     # turn a response packet into am easy to use dictornary that
     # abstracts away the protocol
     def __processReturnedInfo(self, response):
+        # Protocol_header + " " + status_code + " " 
+        # + Status_message + "\n" + data_requested + delimiter 
 
-        
         # first space is the end of the protocol header
         hdr = response.split(" ", 1)
         

@@ -172,6 +172,8 @@ class HOAStryngS:
         #end of pollClientForRequest
 
 
+    # creates a packet using the protocol with the given data inside, and 
+    # sends it to the client
     def sendDataToClient(self, clientID,  statusCode: str="20", statusMessage="OK", data=None):
         if (data is not None):
             #take data structures dump into a stream that can be sent on network
