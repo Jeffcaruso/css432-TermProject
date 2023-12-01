@@ -3,7 +3,14 @@ import select
 import random
 import json
 
-
+"""
+Hangman - Term Project
+with Hanging on a Stryng protocol
+authors : Jeffrey Caruso, Cordelia Notbohm
+date    : Fall 2023
+file    : HOAStryngS.py
+class   : HOAStryngS
+"""
 
 class HOAStryngS:
     DELIM = "~~~~~~()"
@@ -17,17 +24,21 @@ class HOAStryngS:
         # end init
 
 
-    # prep listener
+    # prep listener socket
     def __prepListener(self, serverPort: int):
+        # IP , TCP
         self.serverListenerSock = socket(AF_INET, SOCK_STREAM)
+        # don't hold the server socket after app close
         self.serverListenerSock.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
+        #bind server port while app is running
         self.serverListenerSock.bind(('', serverPort))
+        #set to be listening
         self.serverListenerSock.listen(1)
         #end prepListener
 
 
+    # send a packet though the correct conection socket
     def __sendToSocket(self, clientID, packet):
-        # send the packet to the proper client connection
         print("Sent message to: " + str(clientID))
         self.activeClientConnections[clientID].send(packet.encode())      
         #end of sendToSocket
@@ -44,7 +55,7 @@ class HOAStryngS:
         try:
             packet = connectionSocket.recv(1024).decode()
         except:
-            #do nothing helpful
+            #if there was nothing to recieve
             packet = ""
             
 
@@ -67,18 +78,21 @@ class HOAStryngS:
         #end of __nonBlockingRecieveFrom
 
 
+    # 
     def __parseRequestPacket(self, packet):
         #Protocol_header + method_type + "\n" + requestData + delim
         
         # first space is the end of the protocol header
         hdr = packet.split(" ", 1)
         
-        # next \n is the end of the statusCode
-        # get status code
+        # get method type
         methodType = hdr[1].split("\n", 1)
 
-        # then delim is the end of the data
+        # delim is at the end of the data
+        # get data
         data = methodType[1].split(self.DELIM,1)
+
+        # format the packet into a dictionary
         if len(data[0]) > 0 :
             returnDict = {
                 "Method Type" : methodType[0],
@@ -95,11 +109,11 @@ class HOAStryngS:
 
     # generates a new unique four digit client ID number
     def __getNewClientID(self):
-        # generate random # [0,9999]
+        # generate random #
         tempID = random.randrange(0, 9999, 1)
 
         while(tempID in self.activeClientConnections.keys()):
-            #while tempIDis one of the keys, keep trying
+            # Keep trying to get a unique ID
             tempID = random.randrange(0, 9999, 1)
             
         return tempID
@@ -117,6 +131,7 @@ class HOAStryngS:
         # if socket does have something to read, accept a new client connection
         for s in readable:
             if s is self.serverListenerSock:
+                #have a connection to make, so make a connection on a new socket
                 connectionSocket, clientAddress = self.serverListenerSock.accept()
                 # add generate unique ID and add connection to list of active clients
                 clientID = self.__getNewClientID()
@@ -136,12 +151,12 @@ class HOAStryngS:
         clientConnection = self.activeClientConnections[clientID]
         packet = self.__nonBlockingRecieveFrom(clientConnection)
 
+        # if no packet, stop processing
         if packet is None:
             return
         
-        # first 8 Bytes is the PROTOCOL_HEADER
-        # find the next 4 bytes of the packet determine the method type
-        #methodType = packet[8 : 12] #[8,11]
+        # first is the PROTOCOL_HEADER
+        # next is 4 characters identifying the method type
         hdr = packet.split(" ", 1)
         methodType = hdr[1].split("\n",1)
 
@@ -158,19 +173,20 @@ class HOAStryngS:
 
     def sendDataToClient(self, clientID,  statusCode: str="20", statusMessage="OK", data=None):
         if (data is not None):
+            #take data structures dump into a stream that can be sent on network
             jsonDumpedData = json.dumps(data)
             packet = self.PROTOCOL_HEADER + statusCode + " " + statusMessage + "\n" + jsonDumpedData + self.DELIM
         else:
             packet = self.PROTOCOL_HEADER + statusCode + " " + statusMessage + "\n" + self.DELIM
+        #send it
         self.__sendToSocket(clientID, packet)
         #end of sendDataToClient
 
 
+    # remove all connection data for a client
     def removeClient(self, clientID):
         self.activeClientConnections[clientID].close()
         del self.activeClientConnections[clientID]
         #end removeClient
 
-
-        
     #end HOAStryngS

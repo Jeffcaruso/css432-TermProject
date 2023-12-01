@@ -2,10 +2,16 @@ import sys
 import time
 from HOAStryngC import HOAStryngC
 from termios import TCIFLUSH, TCOFLUSH, tcflush
-# Import the libraries inputimeout, TimeoutOccurred 
-# from inputimeout import inputimeout # Import the libraries inputimeout, TimeoutOccurred 
-# from inputimeout import inputimeout 
 import select
+
+"""
+Hangman - Term Project
+with Hanging on a Stryng protocol
+authors : Jeffrey Caruso, Cordelia Notbohm
+date    : Fall 2023
+file    : hangmanClient.py
+class   : hangmanClient
+"""
 
 class hangmanClient:
 
@@ -23,14 +29,22 @@ class hangmanClient:
         
             #loop and keep showing main menu till user decides to unregister 
             while stillPlaying and self.registeredWithServer :
-                self.mainMenu()
+                # self.mainMenu()
+                
+                try:
+                    self.mainMenu()
+                except:
+                    self.net.unregister()
+                    self.registeredWithServer = False
+                    print("Unexpected error: disconnected from server")
+                    print()
         #end client
 
 
     def startMenu(self):
         # main menu options 
         print("Welcome To Hangman")
-        self.printHangmanDisplay(0)
+        self.printHangmanDisplay(6)
         print("Select an option from this list (enter the #)")
         print("1 - Join a Server (Register)")
         print("2 - Quit (Stop Playing)")
@@ -154,18 +168,6 @@ class hangmanClient:
         else:
             print("unexpected error")
 
-
-
-        # response = self.net.getScoreboard()
-        # data = response["Data"]
-        # yourScore = data["your score"]
-        # scoreboard = data["scoreboard"]
-        
-        # print("Your current number of wins: " + str(yourScore))
-        # print("Current Scoreboard:")
-        # for score in scoreboard:
-        #     print(score["username"].ljust(20) + "Wins: " + str(score["wins"]))        
-        # print()
         #end list game
 
 
@@ -449,7 +451,7 @@ class hangmanClient:
         print(censoredWord)
         print()
 
-        #NOTE: win/lost in game state is based on if word was guessed. so for word selector, they are flipped.
+        # Win/lost in game state is based on if word was guessed. so for word selector, they are flipped.
         if gameState == "WON":
             print("You Lost")
             time.sleep(2)            
@@ -477,7 +479,6 @@ class hangmanClient:
 
 
     def displayScoreboard(self):
-        # https://stackoverflow.com/questions/17330139/python-printing-a-dictionary-as-a-horizontal-table-with-headers 
         response = self.net.getScoreboard()
         data = response["Data"]
         yourScore = data["your score"]

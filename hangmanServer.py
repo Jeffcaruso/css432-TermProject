@@ -4,6 +4,16 @@ import random
 import json
 from game import game
 
+"""
+Hangman - Term Project
+with Hanging on a Stryng protocol
+authors : Jeffrey Caruso, Cordelia Notbohm
+date    : Fall 2023
+file    : hangmanServer.py
+class   : hangmanServer
+"""
+
+
 # will check for a new client connection
 # will loop through client IDs
 # run pollClientForRequest() for each clientID...
@@ -53,7 +63,6 @@ class hangmanServer:
     def __processList(self, clientID):
         print("got to processList")
 
-        #NOTE, these need to be gameID, username
         gameList = list()
         #gameID, username1, username2
 
@@ -200,7 +209,6 @@ class hangmanServer:
         del self.scoreboard[20:]
 
         # persist scoreboard to file
-        # NOTE: backup to file?
         with open('scoreboard.json', 'w') as outfile:
             json.dump(self.scoreboard, outfile)
 

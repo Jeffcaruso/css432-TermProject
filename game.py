@@ -1,4 +1,13 @@
 
+"""
+Hangman - Term Project
+with Hanging on a Stryng protocol
+authors : Jeffrey Caruso, Cordelia Notbohm
+date    : Fall 2023
+file    : game.py
+class   : game
+"""
+
 class game:
     """A hangman game class that keeps track of the current status of 
     a game of hangman

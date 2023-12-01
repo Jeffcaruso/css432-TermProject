@@ -1,32 +1,38 @@
 from socket import *
 import json
 
+"""
+Hangman - Term Project
+with Hanging on a Stryng protocol
+authors : Jeffrey Caruso, Cordelia Notbohm
+date    : Fall 2023
+file    : HOAStryngC.py
+class   : HOAStryngC
+"""
 
 class HOAStryngC:
-    # <start of class>
     DELIM = "~~~~~~()"
     PROTOCOL_HEADER = "HOAS/1.0 "
-
-    # funtions
 
     def __init__(self):
         init = True
         #end init
 
-    # set up socket 
+    # set up connection socket 
     def __prepSocket(self, hostName, portNumber):
+        # IP , TCP
         self.clientSocket = socket(AF_INET, SOCK_STREAM)
         self.clientSocket.connect((hostName, portNumber))        
         # end of prepSocket
 
 
-    # send though server socket
+    # send though connection socket
     def __sendToSocket(self, packet):
         self.clientSocket.send(packet.encode())
         #end of sendToSocket
 
 
-    # blocking read from the socket 
+    # blocking read from the connection socket 
     def __recieveFromSocket(self):
         bytePacket = self.clientSocket.recv(1024)
         packet = bytePacket.decode()
@@ -40,17 +46,18 @@ class HOAStryngC:
         while packet.find(self.DELIM) == -1:  
             bytePacket = self.clientSocket.recv(1024)
             packet += bytePacket.decode()
-            print("here HCS rfs 7")
+            print("waiting on server (ctrl + c to give up)")
 
         return packet
         #end of recieveFromSocket
 
 
+    # turn a packet into am easy to use dictornary that
+    # abstracts away the protocol
     def __processReturnedInfo(self, response):
         # first space is the end of the protocol header
         hdr = response.split(" ", 1)
         
-        # next space is the end of the statusCode
         # get status code
         statC = hdr[1].split(" ",1)
 
@@ -58,14 +65,12 @@ class HOAStryngC:
         statusMsg = statC[1].split("\n", 1)
 
         # get data 
-        
         dataAndDelim = statusMsg[1]
-        #data = dataAndDelim[1].split(self.DELIM, 1)
         data = dataAndDelim.split(self.DELIM,1)
-        #print("data(" + data[0] + ")")
 
         # if there was data 
         if len(data[0]) != 0 :
+            #unloading data from net into desired structure
             data_loaded = json.loads(data[0])
             returnDict = {
                 "Status Code" : statC[0],
@@ -84,7 +89,7 @@ class HOAStryngC:
         #end processReturnedInfo
         
 
-    # end a constructed request packet, wait for a response
+    # send a constructed request packet, wait for a response
     # and then return a dic with a processsed return
     def __sendRequestAndReturnResponse(self, packet):
         # send the packet
@@ -96,7 +101,7 @@ class HOAStryngC:
         #end of __sendRequestAndReturnResponse
 
 
-    # register
+    # register with a server
     def register(self, hostName, portNumber, username):
         self.__prepSocket(hostName, portNumber)
         # build the packet using our protocol 
@@ -111,7 +116,7 @@ class HOAStryngC:
         # end of register
 
 
-    # request list of games
+    # request list of games from a server
     def requestGamesList(self):
         # build the packet using our protocol 
         packet = self.PROTOCOL_HEADER + "LIST\n" + self.DELIM
@@ -147,7 +152,7 @@ class HOAStryngC:
         # end exitGame
 
 
-    # unregister 
+    # unregister from a server
     def unregister(self):
         # build the packet using our protocol 
         packet = self.PROTOCOL_HEADER + "UNRG\n" + self.DELIM
@@ -169,16 +174,6 @@ class HOAStryngC:
         # end guessLetter
 
 
-    ## NOTE, EC, complete this later...
-    # guess word 
-    def __guessWord(self, guessedWord):
-        # build the packet using our protocol 
-        packet = self.PROTOCOL_HEADER + "GUEW\n" + guessedWord + self.DELIM
-        # send the packet and return result 
-        return self.__sendRequestAndReturnResponse(packet)
-        #end guessWord
-
-
     # select a word
     def selectWord(self, enteredWord):
         # build the packet using our protocol 
@@ -197,7 +192,6 @@ class HOAStryngC:
         #end askGameState
 
 
-    ## NOTE, EC, complete this later...
     # get scoreboard
     def getScoreboard(self):
         # build the packet using our protocol 
@@ -206,5 +200,5 @@ class HOAStryngC:
         return self.__sendRequestAndReturnResponse(packet)
         #end getScoreboard
 
-    # <end of class>
+    # end of HOAStryngC
 
