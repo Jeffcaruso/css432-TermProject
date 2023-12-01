@@ -1,6 +1,7 @@
 import sys
 from HOAStryngS import HOAStryngS
 import random
+import json
 from game import game
 
 # will check for a new client connection
@@ -14,6 +15,10 @@ class hangmanServer:
         self.clientIDToUsername = dict()
         self.gameIDtoGame = dict()
         self.clientIDToGameID = dict()
+        self.clientIDtoWins = dict()
+
+        # read in scoreboard from file
+        self.scoreboard = list()
         #end init
 
     def __processRegister(self, clientID, RegisterRequest):
@@ -34,6 +39,7 @@ class hangmanServer:
         
         # assign username to clientID
         self.clientIDToUsername[clientID] = username
+        self.clientIDtoWins[clientID] = 0
 
         # send status back to client
         self.net.sendDataToClient(clientID, "20", "OK")
@@ -161,15 +167,48 @@ class hangmanServer:
             self.net.sendDataToClient(clientID, "50", "Internal Server Error")
             return
         
-        # Phase 2: exit game
-        if self.gameIDtoGame[gameID].removePlayer(clientID):
+        # Phase 2: increment points if they won
+        game = self.gameIDtoGame[gameID]
+        if game.getGuesser() == clientID: #guesser
+            if game.roundWon():
+                self.clientIDtoWins[clientID] += 1
+        else: #selector 
+            if game.roundLost():
+                self.clientIDtoWins[clientID] += 1
+
+        # Phase 3: exit game
+        if game.removePlayer(clientID):
             del self.clientIDToGameID[clientID]
-            if self.gameIDtoGame[gameID].getNumPlayers() == 0:
+            if game.getNumPlayers() == 0:
                 del self.gameIDtoGame[gameID]
             self.net.sendDataToClient(clientID, "20", "OK")
         else:
             self.net.sendDataToClient(clientID, "50", "Internal Server Error")
         #end __processList
+
+
+    def __addClientsScoreToScoreboard(self, clientID):
+        # creating dictionary with user's score 
+        clientToScore = {
+            "username" : self.clientIDToUsername[clientID],
+            "wins" : self.clientIDtoWins[clientID]
+        }
+
+        # add users score
+        self.scoreboard.append(clientToScore) 
+
+        # sort the scoreboard
+        self.scoreboard = sorted(self.scoreboard, key=lambda x:x['wins'], reverse=True)
+
+        # trim scoreboard if above some length
+        del self.scoreboard[20:]
+
+        # persist scoreboard to file
+        # NOTE: backup to file?
+        with open("scoreboard.json", "w") as outfile:
+            json.dump(self.scoreboard, outfile)
+
+        #end __addClientsScoreToScoreboard
 
 
     def __processUnregister(self, clientID, unregisterRequest):
@@ -180,10 +219,14 @@ class hangmanServer:
             if self.gameIDtoGame[gameID].getNumPlayers() == 0:
                 del self.gameIDtoGame[gameID]
             del self.clientIDToGameID[clientID]
+
+        # Phase 2 add score to scoreboard
+        self.__addClientsScoreToScoreboard(clientID)
         
-        # Phase 2: Unregister (will already not be in a game by here...)
+        # Phase 3: Unregister (will already not be in a game by here...)
         # remove from association of clientID to usernames (removing them from being a valid player...?)
         del self.clientIDToUsername[clientID]
+        del self.clientIDtoWins[clientID]
         self.net.sendDataToClient(clientID, "20", "OK")
         
         self.net.removeClient(clientID)
@@ -262,7 +305,30 @@ class hangmanServer:
 
 
     def __processGetScoreBoard(self, clientID, getScoreBoardRequest):
-        print(clientID)
+        # for now prob skip checking clientID (not necessary at all it seems)
+        clientScore = self.clientIDtoWins[clientID]
+
+        ScoreInfo = {
+            "scoreboard" : self.scoreboard,
+            "your score" : clientScore
+        }
+        self.net.sendDataToClient(clientID, "20", "OK", ScoreInfo)
+
+        #all
+
+
+            # client
+            # rest of SB
+        #other side
+        #client - print
+        # SB = all[sb]
+        #sort(SB)
+
+        #SB 
+        # key int
+        # value as a dic usnamer to score
+        # username
+        # score
         #end __processGetScoreBoard
 
 

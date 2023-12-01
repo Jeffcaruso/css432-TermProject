@@ -95,7 +95,8 @@ class hangmanClient:
         print("1 - Create a new Game")
         print("2 - Find a game to join (list games)")
         print("3 - Join an existing game")
-        print("4 - Disconnect from server (unregister)")
+        print("4 - See Scoreboard")
+        print("5 - Disconnect from server (unregister)")
 
         try:
             option = int(input("Enter option number: "))
@@ -110,6 +111,8 @@ class hangmanClient:
         elif option == 3:
             self.joinGame()
         elif option == 4:
+            self.displayScoreboard()
+        elif option == 5:
             self.net.unregister()
             self.registeredWithServer = False
         else:
@@ -312,18 +315,6 @@ class hangmanClient:
                 print("1 - Stay")
                 print("2 - Exit this game")
 
-
-                # print("Enter option number (you have 5 seconds):")
-                # tcflush(sys.stdout, TCOFLUSH)
-                # tcflush(sys.stdin, TCIFLUSH)
-                # read, write, exc = select.select([sys.stdin], [], [], 5)
-
-                # if (read):
-                #     option = sys.stdin.readline()
-                #     option = int(option)
-                # else:
-                #     option = 1
-
                 try:
                     print("Enter option number (you have 5 seconds):")
                     tcflush(sys.stdout, TCOFLUSH)
@@ -381,6 +372,17 @@ class hangmanClient:
         print (file_contents)
         f.close()
         #end printHangmanDisplay
+
+
+    def displayScoreboard(self):
+        # https://stackoverflow.com/questions/17330139/python-printing-a-dictionary-as-a-horizontal-table-with-headers 
+        response = self.net.getScoreboard()
+
+        print(response)
+        # table = pd.DataFrame(response["Data"])
+        # print(table)
+
+        #end displayScoreboard
 
 
 def main():

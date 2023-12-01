@@ -90,8 +90,7 @@ class game:
             "You Are Guesser" : bool(self.guesser == clientID),
             "Censored Word" : self.censoredWord,
             "Incorrect Guesses" : self.numIncorrectGuesses,
-            "Game State" : str(gameState),
-            "Player To Score" : self.clientIDtoScore
+            "Game State" : str(gameState)
         }
         
         return gameInfo
