@@ -144,10 +144,28 @@ class hangmanClient:
             gameList = response["Data"]
             print("Game List:")
             for gameInfo in gameList:
-                print(gameInfo)
+                # str1 = ""
+                # for x in gameInfo["usernames"]:
+                #     str1 += x
+                # str1.join(gameInfo["usernames"])
+                print("Game ID: " +  str(gameInfo["gameID"]) + "\t" + "Players: " + str(gameInfo["usernames"]))
+                #print(gameInfo)
             print()
         else:
             print("unexpected error")
+
+
+
+        # response = self.net.getScoreboard()
+        # data = response["Data"]
+        # yourScore = data["your score"]
+        # scoreboard = data["scoreboard"]
+        
+        # print("Your current number of wins: " + str(yourScore))
+        # print("Current Scoreboard:")
+        # for score in scoreboard:
+        #     print(score["username"].ljust(20) + "Wins: " + str(score["wins"]))        
+        # print()
         #end list game
 
 
@@ -465,10 +483,10 @@ class hangmanClient:
         yourScore = data["your score"]
         scoreboard = data["scoreboard"]
         
+        print("Your current number of wins: " + str(yourScore))
         print("Current Scoreboard:")
         for score in scoreboard:
-            print(score)
-        print("Your current number of wins: " + str(yourScore))
+            print(score["username"].ljust(20) + "Wins: " + str(score["wins"]))        
         print()
 
         #end displayScoreboard
