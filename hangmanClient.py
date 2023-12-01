@@ -377,8 +377,11 @@ class hangmanClient:
     def displayScoreboard(self):
         # https://stackoverflow.com/questions/17330139/python-printing-a-dictionary-as-a-horizontal-table-with-headers 
         response = self.net.getScoreboard()
-
-        print(response)
+        data = response["Data"]
+        yourScore = data["your score"]
+        scoreboard = data["scoreboard"]
+        print(yourScore)
+        print(scoreboard)
         # table = pd.DataFrame(response["Data"])
         # print(table)
 

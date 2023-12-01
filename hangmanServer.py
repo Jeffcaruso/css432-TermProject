@@ -18,7 +18,11 @@ class hangmanServer:
         self.clientIDtoWins = dict()
 
         # read in scoreboard from file
-        self.scoreboard = list()
+        try:
+            with open('scoreboard.json', 'r') as openfile:
+                self.scoreboard = list(json.load(openfile))
+        except:
+            self.scoreboard = list()
         #end init
 
     def __processRegister(self, clientID, RegisterRequest):
@@ -205,7 +209,7 @@ class hangmanServer:
 
         # persist scoreboard to file
         # NOTE: backup to file?
-        with open("scoreboard.json", "w") as outfile:
+        with open('scoreboard.json', 'w') as outfile:
             json.dump(self.scoreboard, outfile)
 
         #end __addClientsScoreToScoreboard
