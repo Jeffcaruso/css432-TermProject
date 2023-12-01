@@ -1,4 +1,3 @@
-
 """
 Hangman - Term Project
 with Hanging on a Stryng protocol
@@ -8,14 +7,8 @@ file    : game.py
 class   : game
 """
 
+# class that keeps track of a single game 
 class game:
-    """A hangman game class that keeps track of the current status of 
-    a game of hangman
-
-    Args:
-        gameID (int): the unique id associated with this game
-    """
-    
     # Game constants 
     NUM_ROUNDS_TILL_LOSE = 6
     MAX_PLAYERS = 2
@@ -40,23 +33,25 @@ class game:
     # Main Gameplay Logic Methods 
     ###############################################
 
-    def startNewRound(self):
-        # switch who is guessing
-        for client in self.clientIDtoScore.keys():
-            if self.getGuesser != client:
-                self.setGuesser = client
+    #NOTE: for if we later would want to allow a game
+    # to last multiple rounds with the players
+    # switching roles
+    # def startNewRound(self):
+    #     # switch who is guessing
+    #     for client in self.clientIDtoScore.keys():
+    #         if self.getGuesser != client:
+    #             self.setGuesser = client
 
-        # reset game variables
-        self.word = None
-        self.censoredWord = None
-        self.lastGuess = None
-        self.numIncorrectGuesses = 0
-        self.roundNumber = self.roundNumber + 1
-        #end startNewRound()
+    #     # reset game variables
+    #     self.word = None
+    #     self.censoredWord = None
+    #     self.lastGuess = None
+    #     self.numIncorrectGuesses = 0
+    #     self.roundNumber = self.roundNumber + 1
+    #     #end startNewRound()
 
 
     # word status methods 
-    #NOTE: still need to decide how points will work and 
     # and add that processing in here 
     def processGuessLetter(self, letter : str):
         # if round has been won or lost, don't update anything
@@ -84,9 +79,13 @@ class game:
             return False
         #end processGuessLetter
         
-    #NOTE: this needs to be modified to give username to points, not 
-    # client id to points
+
+    # create a dictonary with all the info
+    # a client might want about a game
     def getGameInfo(self, clientID):
+
+        # get a string that represents the
+        # current state of the game
         if (self.word == None):
             gameState = "INIT"
         elif (self.roundWon()):
@@ -96,6 +95,7 @@ class game:
         else:
             gameState = "IN_PROGRESS"
         
+        # fill in other variables
         gameInfo = {
             "GameID" : self.gameID,
             "Num Players" : self.getNumPlayers(),
@@ -119,17 +119,17 @@ class game:
         #end roundWon()
     
 
-    def roundLost(self): # hangman fullly displayed
+    def roundLost(self): # hangman fully displayed
         return self.numIncorrectGuesses >= self.NUM_ROUNDS_TILL_LOSE
         #end roundLost()
     
 
-    def roundInProgress(self):
+    def roundInProgress(self): # game has word but not won or lost
         return (not (self.roundWon() or self.roundLost()) and self.word is not None)
         #end roundInProgres()
         
         
-    def getNumIncorrectGuesses(self):
+    def getNumIncorrectGuesses(self): # get num incorrect guesses 
         return self.getNumIncorrectGuesses
         #end getNumIncorrectGuesses
         
@@ -138,19 +138,19 @@ class game:
     # Game Word methods 
     ###############################################
     
-    def getWord(self):
+    def getWord(self): # get the word 
         return self.word
         #end getWord
 
 
-    def setWord(self, word: str):
+    def setWord(self, word: str): # set the word and censored word
         word = word.lower()
-        
         #censored word
         cWord = ""
         #modified word (lowercase and with "_" instead of " ")
         mWord = ""
         
+        # for each letter constuct both words
         for char in word:
             #" " -> _            
             if char == " ":
@@ -166,7 +166,7 @@ class game:
         #end setWord
 
 
-    def getCensoredWord(self):
+    def getCensoredWord(self): # get the censored word
         return self.censoredWord
         #end getCensoredWord
     
@@ -176,17 +176,17 @@ class game:
     # game Player Methods
     ###############################################
 
-    def getNumPlayers(self):
+    def getNumPlayers(self): # get the number of players
         return len(self.clientIDtoScore.keys())
         #end getNumPlayers
 
 
-    def gameIsFull(self): 
+    def gameIsFull(self):  # true if game is full
         return self.getNumPlayers() >= self.MAX_PLAYERS
         #end gameIsFull
 
 
-    def addPlayer(self, clientID):
+    def addPlayer(self, clientID): # add a player if not full
         # check if game is full
         if self.gameIsFull():
             return False
@@ -196,7 +196,7 @@ class game:
         #end addPlayer 
 
 
-    def removePlayer(self, clientID):
+    def removePlayer(self, clientID): # remove the player if they are in the game
         # check if client is in the game 
         if clientID not in self.clientIDtoScore.keys():
             return False
@@ -206,17 +206,17 @@ class game:
         #end removePlayer 
 
 
-    def getGuesser(self):
+    def getGuesser(self): # get the guesser
         return self.guesser
         #end getGuesser 
 
     
-    def setGuesser(self, clientID):
+    def setGuesser(self, clientID): # set the guesser
         self.guesser = clientID
         #end setGuesser
         
         
-    def getScore(self, clientID): 
+    def getScore(self, clientID): # get the score of a client id 
         return self.clientIDtoScore[clientID]
         #end getScore
 

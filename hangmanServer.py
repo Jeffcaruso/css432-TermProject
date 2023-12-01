@@ -13,11 +13,10 @@ file    : hangmanServer.py
 class   : hangmanServer
 """
 
-
+# a hangman server that facilitates games of hangman
 # will check for a new client connection
 # will loop through client IDs
 # run pollClientForRequest() for each clientID...
-
 class hangmanServer:
     
     def __init__(self, serverPort):

@@ -10,6 +10,7 @@ file    : HOAStryngC.py
 class   : HOAStryngC
 """
 
+# a class that handles the client side of the HOAS protocol 
 class HOAStryngC:
     DELIM = "~~~~~~()"
     PROTOCOL_HEADER = "HOAS/1.0 "

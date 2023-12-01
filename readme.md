@@ -14,6 +14,12 @@
 3) Use the start menu within the game to connect to a server
 4) Use the main menu once connected to the server to play the game with you and a friend
 
+#### Files needed for Game Client
+- hangmanClient.py
+- HOAStryngC.py
+- game.py
+- startClient.sh (if you want to use shell script to run)
+
 
 ### Game Server Instructions - if you cannot find an already active server
 1) Identify the computer you are going to run the server app on to (its hostname, an acceptable port to host the game on)
@@ -22,9 +28,15 @@
     2) python3 hangmanServer.py <port#>
         - e.g., "python3 hangmanServer.py 1234" to have the server port of 1234
 
+#### Files needed for Game Server
+- hangmanServer.py
+- HOAStryngS.py
+- game.py
+- scoreboard.json
+- startServer.sh (if you want to use shell script to run)
+
+
 
 ## Documentation Links
-- [protocol documentation](https://docs.google.com/document/d/1NuUj9wqFaEueTtUwdIeYir1m1rvpkxbhUfHKuwzdIfk/edit?usp=sharing)
-- [Instructions documentation](https://docs.google.com/document/d/1YsQWbQr7iAAnxoI-eDzS7lgPOox7n_Z11neOFjEYy0s/edit?usp=sharing)
-- [Teamwork documentation](https://docs.google.com/document/d/1v2gizOdAToVRhrHxLdsfU4xikV7R00q2ZMuenxTqeo4/edit?usp=sharing)
-
+- [Protocol Documentation](https://docs.google.com/document/d/1NuUj9wqFaEueTtUwdIeYir1m1rvpkxbhUfHKuwzdIfk/edit?usp=sharing)
+- [Instructions Documentation](https://docs.google.com/document/d/1YsQWbQr7iAAnxoI-eDzS7lgPOox7n_Z11neOFjEYy0s/edit?usp=sharing)

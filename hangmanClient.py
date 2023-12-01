@@ -13,6 +13,8 @@ file    : hangmanClient.py
 class   : hangmanClient
 """
 
+# A client program that talks to a hangman server
+# to play a game of hangman
 class hangmanClient:
 
     def __init__(self):
@@ -20,7 +22,9 @@ class hangmanClient:
         self.registeredWithServer = False
         #end init
 
-    
+
+    # the main gameplay loops
+    # that keep the program running as long as the client wants to play
     def client(self):
         # loop and keep showing the start menu till player decides to quit
         stillPlaying = True
@@ -29,8 +33,10 @@ class hangmanClient:
         
             #loop and keep showing main menu till user decides to unregister 
             while stillPlaying and self.registeredWithServer :
-                # self.mainMenu()
-                
+                # if there are any exceptions/bugs that we did not 
+                # manage to find elegant solutions to
+                # then just unregister from the server and fail gracefully
+                # returing to the start menu
                 try:
                     self.mainMenu()
                 except:
@@ -41,8 +47,9 @@ class hangmanClient:
         #end client
 
 
+    # the start up menu that provides an option to register to a server
     def startMenu(self):
-        # main menu options 
+        # print main menu options 
         print("Welcome To Hangman")
         self.printHangmanDisplay(6)
         print("Select an option from this list (enter the #)")
@@ -67,6 +74,8 @@ class hangmanClient:
         #end startMenu 
         
 
+    # asks for all connection info, and attepts to 
+    # register with the client 
     def connectToAServer(self):
         # get regisitration info from user 
         serverName = input("Enter server hostname: ")
@@ -97,13 +106,17 @@ class hangmanClient:
             print("Registration Successful")
             print()   
             self.registeredWithServer = True
-        except:
+
+        except: #otherwise just return to start menu
             print("Could not connect to a server with that hostname/port")
             print()
         # end connectToAServer()
 
 
+    # the main gameplay menu, with all the options to start up 
+    # a game or get info from a particular server 
     def mainMenu(self):
+        # print main menu 
         print("Select an option from this list (enter the #)")
         print("1 - Create a new Game")
         print("2 - Find a game to join (list games)")
@@ -111,6 +124,7 @@ class hangmanClient:
         print("4 - See Scoreboard")
         print("5 - Disconnect from server (unregister)")
 
+        # poll user for option 
         try:
             option = int(input("Enter option number: "))
             print()
