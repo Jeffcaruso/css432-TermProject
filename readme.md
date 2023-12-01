@@ -1,6 +1,5 @@
 # Term Project - Hangman
-
-## Network library - hanging on a stryng
+### Network library - Hanging On A Stryng
 
 ## How to Play
 ### Requirements

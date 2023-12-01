@@ -33,24 +33,6 @@ class game:
     # Main Gameplay Logic Methods 
     ###############################################
 
-    #NOTE: for if we later would want to allow a game
-    # to last multiple rounds with the players
-    # switching roles
-    # def startNewRound(self):
-    #     # switch who is guessing
-    #     for client in self.clientIDtoScore.keys():
-    #         if self.getGuesser != client:
-    #             self.setGuesser = client
-
-    #     # reset game variables
-    #     self.word = None
-    #     self.censoredWord = None
-    #     self.lastGuess = None
-    #     self.numIncorrectGuesses = 0
-    #     self.roundNumber = self.roundNumber + 1
-    #     #end startNewRound()
-
-
     # word status methods 
     # and add that processing in here 
     def processGuessLetter(self, letter : str):
