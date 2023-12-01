@@ -230,6 +230,10 @@ class hangmanServer:
         if ((clientID != game.getGuesser()) and (not game.roundInProgress())):
             # you are allowed to set the word
             # decide if word is valid - for now just accept all
+            if "Data" not in selectWordRequest.keys():
+                self.net.sendDataToClient(clientID, "41", "Invalid Method Parameter")
+                return
+            
             word = selectWordRequest["Data"]
             game.setWord(word)
             #ack

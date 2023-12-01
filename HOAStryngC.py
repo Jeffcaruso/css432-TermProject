@@ -188,15 +188,6 @@ class HOAStryngC:
         #end selectWord
 
 
-    # initialize guesser 
-    def initGuesser(self):
-        # build the packet using our protocol 
-        packet = self.PROTOCOL_HEADER + "INIG\n" + self.DELIM
-        # send the packet and return result 
-        return self.__sendRequestAndReturnResponse(packet)
-        #end initGuesser
-
-
     # ask game state
     def askGameState(self):
         # build the packet using our protocol 
@@ -204,24 +195,6 @@ class HOAStryngC:
         # send the packet and return result 
         return self.__sendRequestAndReturnResponse(packet)
         #end askGameState
-
-
-    # get my points
-    def getMyPoints(self):
-        # build the packet using our protocol 
-        packet = self.PROTOCOL_HEADER + "GMPT\n" + self.DELIM
-        # send the packet and return result 
-        return self.__sendRequestAndReturnResponse(packet)
-        #end getMyPoints
-
-
-    # get opponent's points
-    def getOpponentPoints(self):
-        # build the packet using our protocol 
-        packet = self.PROTOCOL_HEADER + "GOPT\n" + self.DELIM
-        # send the packet and return result 
-        return self.__sendRequestAndReturnResponse(packet)
-        #end getOpponetsPoints
 
 
     ## NOTE, EC, complete this later...

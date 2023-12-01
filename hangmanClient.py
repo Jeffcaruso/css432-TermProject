@@ -1,6 +1,7 @@
 import sys
 import time
 from HOAStryngC import HOAStryngC
+from termios import TCIFLUSH, TCOFLUSH, tcflush
 # Import the libraries inputimeout, TimeoutOccurred 
 # from inputimeout import inputimeout # Import the libraries inputimeout, TimeoutOccurred 
 # from inputimeout import inputimeout 
@@ -186,10 +187,16 @@ class hangmanClient:
             
                 try:
                     print("Enter option number (you have 5 seconds):")
-                    option = int(select.select([sys.stdin], [], [], 5))
-                    print(option)
-                    if option is None:
+                    tcflush(sys.stdout, TCOFLUSH)
+                    tcflush(sys.stdin, TCIFLUSH)
+                    read, write, exc = select.select([sys.stdin], [], [], 5)
+
+                    if (read):
+                        option = sys.stdin.readline()
+                        option = int(option)
+                    else:
                         option = 1
+
                 except:
                     option = -1
                 
@@ -305,12 +312,30 @@ class hangmanClient:
                 print("1 - Stay")
                 print("2 - Exit this game")
 
+
+                # print("Enter option number (you have 5 seconds):")
+                # tcflush(sys.stdout, TCOFLUSH)
+                # tcflush(sys.stdin, TCIFLUSH)
+                # read, write, exc = select.select([sys.stdin], [], [], 5)
+
+                # if (read):
+                #     option = sys.stdin.readline()
+                #     option = int(option)
+                # else:
+                #     option = 1
+
                 try:
-                    print("Enter option number (you have 2 seconds):")
-                    option = int(select.select([sys.stdin], [], [], 5))
-                    print(option)
-                    if option is None:
+                    print("Enter option number (you have 5 seconds):")
+                    tcflush(sys.stdout, TCOFLUSH)
+                    tcflush(sys.stdin, TCIFLUSH)
+                    read, write, exc = select.select([sys.stdin], [], [], 5)
+
+                    if (read):
+                        option = sys.stdin.readline()
+                        option = int(option)
+                    else:
                         option = 1
+                    
                 except:
                     option = -1
 
@@ -323,8 +348,10 @@ class hangmanClient:
                     return
                 else:
                     print("Option not supported")
+                    #effect is waiting
             #otherwise, stay, so do nothing
             #end of while
+
 
         self.printHangmanDisplay(numIncorrectGuesses)
         print(censoredWord)
