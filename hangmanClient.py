@@ -31,7 +31,6 @@ class hangmanClient:
         # main menu options 
         print("Welcome To Hangman")
         self.printHangmanDisplay(0)
-        print()
         print("Select an option from this list (enter the #)")
         print("1 - Join a Server (Register)")
         print("2 - Quit (Stop Playing)")
@@ -125,10 +124,13 @@ class hangmanClient:
         response = self.net.createNewGame()
         statusCode = response["Status Code"]
         
-        
         if statusCode == "20":
+            print("Created game " + str(response["Data"]["GameID"]))
             IAmGuesser = response["Data"]["You Are Guesser"]
-            self.playGame(IAmGuesser)
+            if self.waitForAnotherPlayer():
+                self.playGame(IAmGuesser)
+            else:
+                return
         else:
             print("could not create game")
         #end create game
@@ -140,9 +142,10 @@ class hangmanClient:
 
         if(statusCode == "20"):
             gameList = response["Data"]
+            print("Game List:")
             for gameInfo in gameList:
                 print(gameInfo)
-
+            print()
         else:
             print("unexpected error")
         #end list game
@@ -150,10 +153,12 @@ class hangmanClient:
 
     def joinGame(self):
         gameID = int(input("Enter gameID: "))
+        print()
         response = self.net.joinGame(gameID)
         statusCode = response["Status Code"]
         
         if statusCode == "20":
+            print("Joined game " + str(gameID))
             IAmGuesser = response["Data"]["You Are Guesser"]
             self.playGame(IAmGuesser)
         else:
@@ -161,29 +166,24 @@ class hangmanClient:
         #end joingame
     
     
-    def playGame(self, IAmGuesser):
-        if(IAmGuesser):
-            self.playGuesser()
-        else:
-            self.playSelector()
-        #end playGame
-
-
-    def playGuesser(self):
-        print("Waiting for other player to enter a word for you to guess")
-        
+    def waitForAnotherPlayer(self):
+        # check if the other player has joined yet
+        print("Waiting for another player to join")
+    
         numWaitCyclesSinceChecked = 0
         response = self.net.askGameState()
-        while(response["Status Code"] != "20" or response["Data"]["Censored Word"] is None):
-            #wait for the selector
+        
+        while(response["Status Code"] != "20" or response["Data"]["Num Players"] < 2):
+            # wait for another player
             print("wait...")
-            time.sleep(2.5)
+            time.sleep(5)
             numWaitCyclesSinceChecked += 1
             
             # if they have been waiting a while give them a chance to leave
             # the game
-            if (numWaitCyclesSinceChecked > 10):
+            if (numWaitCyclesSinceChecked > 4):
                 numWaitCyclesSinceChecked = 0
+                print()
                 print("Select an option from this list (enter the #)")
                 print("1 - Keep Waiting")
                 print("2 - Exit this game")
@@ -196,6 +196,7 @@ class hangmanClient:
 
                     if (read):
                         option = sys.stdin.readline()
+                        print()
                         option = int(option)
                     else:
                         option = 1
@@ -205,17 +206,83 @@ class hangmanClient:
                 
                 if option == 1:
                     print("Waiting for other Player")
+                    print()
                 elif option == 2:
                     print("exiting")
+                    print()
+                    response = self.net.exitGame()
+                    return False
+                else:
+                    print("Option not supported")
+                    print()
+                
+            response = self.net.askGameState()     
+        #end wait loop
+        
+        print("Another player has joined!")
+        return True
+        #end waitForAnotherPlayer
+    
+    
+    def playGame(self, IAmGuesser):
+        if(IAmGuesser):
+            self.playGuesser()
+        else:
+            self.playSelector()
+        #end playGame
+
+
+    def playGuesser(self):
+        print("You are the Guesser!")
+        print("Waiting for other player to enter a word for you to guess")
+        
+        numWaitCyclesSinceChecked = 0
+        response = self.net.askGameState()
+        while(response["Status Code"] != "20" or response["Data"]["Censored Word"] is None):
+            #wait for the selector
+            print("wait...")
+            time.sleep(5)
+            numWaitCyclesSinceChecked += 1
+            
+            # if they have been waiting a while give them a chance to leave
+            # the game
+            if (numWaitCyclesSinceChecked > 4):
+                numWaitCyclesSinceChecked = 0
+                print()
+                print("Select an option from this list (enter the #)")
+                print("1 - Keep Waiting")
+                print("2 - Exit this game")
+            
+                try:
+                    print("Enter option number (you have 5 seconds):")
+                    tcflush(sys.stdout, TCOFLUSH)
+                    tcflush(sys.stdin, TCIFLUSH)
+                    read, write, exc = select.select([sys.stdin], [], [], 5)
+
+                    if (read):
+                        option = sys.stdin.readline()
+                        print()
+                        option = int(option)
+                    else:
+                        option = 1
+
+                except:
+                    option = -1
+                
+                if option == 1:
+                    print("Waiting for other Player")
+                    print()
+                elif option == 2:
+                    print("exiting")
+                    print()
                     response = self.net.exitGame()
                     return
                 else:
                     print("Option not supported")
+                    print()
                 
             response = self.net.askGameState()     
         #end wait loop
-
-        print(response)
         
         numIncorrectGuesses = response["Data"]["Incorrect Guesses"]
         censoredWord = response["Data"]["Censored Word"]
@@ -238,12 +305,19 @@ class hangmanClient:
 
             if option == 1:
                 suppliedLetter = input("letter: ")
+                suppliedLetter = suppliedLetter[0]
                 response = self.net.guessLetter(suppliedLetter) 
                 
+                oldNumIncorrectGuesses = numIncorrectGuesses
                 numIncorrectGuesses = response["Data"]["Incorrect Guesses"]
                 censoredWord = response["Data"]["Censored Word"]
                 gameState = response["Data"]["Game State"]
                 
+                if oldNumIncorrectGuesses == numIncorrectGuesses:
+                    print("Good guess, " + suppliedLetter + " is in the word")
+                else:
+                    print("Nice try, but " + suppliedLetter + " is not in the word")
+                    
             elif option == 2:
                 print("exiting")
                 response = self.net.exitGame()
@@ -253,47 +327,52 @@ class hangmanClient:
 
         self.printHangmanDisplay(numIncorrectGuesses)
         print(censoredWord)
+        print()
 
         if gameState == "WON":
             print("You Won!")
-            print()
             time.sleep(2)            
 
         if gameState == "LOST":
             print("You lost")
-            print()
             time.sleep(2)            
 
+        print("Exiting game")
+        print()
         response = self.net.exitGame()
         #end playGuesser
 
 
     def playSelector(self):
+        print("You are the Selector!")
         word = input("Enter a word for the other player to guess:")
         response = self.net.selectWord(word)
         while(response["Status Code"] != "20"):
             #try again
-            print(response)
             word = input("Enter a word for the other player to guess:")
             response = self.net.selectWord(word)
 
-        print(response)
         numIncorrectGuesses = response["Data"]["Incorrect Guesses"]
         censoredWord = response["Data"]["Censored Word"]
         gameState = response["Data"]["Game State"]
+        lastGuess = response["Data"]["Last Guess"]
         numWaitCyclesSinceChecked = 0
         should_print_hangman = True
 
         while gameState == "IN_PROGRESS":
             # print out game state
             if (should_print_hangman):
+                if lastGuess is not None:
+                    print("Other player guessed: " + lastGuess)
+                else:
+                    print("Waiting for other player to guess")
+                    
                 self.printHangmanDisplay(numIncorrectGuesses) 
                 print(censoredWord)
                 print()
 
             # save old game state 
             oldCensoredWord = censoredWord
-            oldNumIncorrectGuesses = numIncorrectGuesses
             oldNumIncorrectGuesses = numIncorrectGuesses
 
             # wait a bit, then get updated game state
@@ -304,6 +383,7 @@ class hangmanClient:
             numIncorrectGuesses = response["Data"]["Incorrect Guesses"]
             censoredWord = response["Data"]["Censored Word"]
             gameState = response["Data"]["Game State"]
+            lastGuess = response["Data"]["Last Guess"]
 
             # check if anything has changed 
             should_print_hangman = (oldCensoredWord != censoredWord) or (oldNumIncorrectGuesses != numIncorrectGuesses)
@@ -323,6 +403,7 @@ class hangmanClient:
 
                     if (read):
                         option = sys.stdin.readline()
+                        print()
                         option = int(option)
                     else:
                         option = 1
@@ -332,32 +413,35 @@ class hangmanClient:
 
                 if option == 1:
                     print("Waiting for other Player")
-
+                    print()
                 elif option == 2:
                     print("exiting")
+                    print()
                     response = self.net.exitGame()
                     return
                 else:
                     print("Option not supported")
+                    print()
                     #effect is waiting
             #otherwise, stay, so do nothing
             #end of while
 
-
+        print("Other Player Guessed: " + lastGuess)
         self.printHangmanDisplay(numIncorrectGuesses)
         print(censoredWord)
+        print()
 
         #NOTE: win/lost in game state is based on if word was guessed. so for word selector, they are flipped.
         if gameState == "WON":
             print("You Lost")
-            print()
             time.sleep(2)            
 
         if gameState == "LOST":
             print("You Won!")
-            print()
             time.sleep(2)            
         
+        print("Exiting game")
+        print()
         response = self.net.exitGame()
         #end playSelector
 
@@ -380,10 +464,12 @@ class hangmanClient:
         data = response["Data"]
         yourScore = data["your score"]
         scoreboard = data["scoreboard"]
-        print(yourScore)
-        print(scoreboard)
-        # table = pd.DataFrame(response["Data"])
-        # print(table)
+        
+        print("Current Scoreboard:")
+        for score in scoreboard:
+            print(score)
+        print("Your current number of wins: " + str(yourScore))
+        print()
 
         #end displayScoreboard
 

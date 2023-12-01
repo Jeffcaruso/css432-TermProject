@@ -96,22 +96,19 @@ class hangmanServer:
         
         # generate new (unique) gameID and create new game
         gameID = self.__getNewGameID()
-        self.gameIDtoGame[gameID] = game(gameID)
-
-        creationInfo = dict()
-        creationInfo["GameID"] = gameID
+        newGame = game(gameID)
+        self.gameIDtoGame[gameID] = newGame
         
         #decide guesser
         if random.randrange(0, 2, 1):
-            creationInfo["You Are Guesser"] = True
-            self.gameIDtoGame[gameID].guesser = clientID            
-        else:
-            creationInfo["You Are Guesser"] = False
+            newGame.guesser = clientID            
 
+        info = newGame.getGameInfo(clientID)
+        
         # add the creator to the game - and return status
-        if self.gameIDtoGame[gameID].addPlayer(clientID):
+        if newGame.addPlayer(clientID):
             self.clientIDToGameID[clientID] = gameID
-            self.net.sendDataToClient(clientID, "20", "OK", creationInfo)
+            self.net.sendDataToClient(clientID, "20", "OK", info)
         else:
             del self.gameIDtoGame[gameID] 
             self.net.sendDataToClient(clientID, "50", "Internal Server Error")
@@ -130,24 +127,19 @@ class hangmanServer:
             self.net.sendDataToClient(clientID, "44", "Cannot Join Game")
             return
     
-
-        joinInfo = dict()
-        joinInfo["GameID"] = gameID
         
+        game = self.gameIDtoGame[gameID]
         #implicit guesser decision
-        if self.gameIDtoGame[gameID].getGuesser() is None:
-            #youre it
-            joinInfo["You Are Guesser"] = True
+        if game.getGuesser() is None:
             self.gameIDtoGame[gameID].guesser = clientID    
-
-        else:
-            joinInfo["You Are Guesser"] = False
         
         # Phase 2: send the stuff out
+        info = game.getGameInfo(clientID)
+        
         # add the creator to the game - and return status
         if self.gameIDtoGame[gameID].addPlayer(clientID):
             self.clientIDToGameID[clientID] = gameID
-            self.net.sendDataToClient(clientID, "20", "OK", joinInfo)
+            self.net.sendDataToClient(clientID, "20", "OK", info)
         else:
             self.net.sendDataToClient(clientID, "44", "Cannot Join Game")
         #end __processJoin
@@ -317,22 +309,6 @@ class hangmanServer:
             "your score" : clientScore
         }
         self.net.sendDataToClient(clientID, "20", "OK", ScoreInfo)
-
-        #all
-
-
-            # client
-            # rest of SB
-        #other side
-        #client - print
-        # SB = all[sb]
-        #sort(SB)
-
-        #SB 
-        # key int
-        # value as a dic usnamer to score
-        # username
-        # score
         #end __processGetScoreBoard
 
 

@@ -21,6 +21,7 @@ class game:
         self.guesser = None #clientID of the guessing client
         self.word = None
         self.censoredWord = None
+        self.lastGuess = None
         self.numIncorrectGuesses = 0  # hangman State
         self.roundNumber = 0
         #end init
@@ -39,6 +40,7 @@ class game:
         # reset game variables
         self.word = None
         self.censoredWord = None
+        self.lastGuess = None
         self.numIncorrectGuesses = 0
         self.roundNumber = self.roundNumber + 1
         #end startNewRound()
@@ -54,6 +56,7 @@ class game:
         
         # if letter is in word, reveal those letters
         letter = letter.lower()
+        self.lastGuess = letter
         if letter in self.word:
             newCensoredWord = ""
             index = 0
@@ -90,6 +93,7 @@ class game:
             "You Are Guesser" : bool(self.guesser == clientID),
             "Censored Word" : self.censoredWord,
             "Incorrect Guesses" : self.numIncorrectGuesses,
+            "Last Guess" : self.lastGuess,
             "Game State" : str(gameState)
         }
         
