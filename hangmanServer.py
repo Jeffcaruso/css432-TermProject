@@ -20,6 +20,7 @@ class   : hangmanServer
 class hangmanServer:
     
     def __init__(self, serverPort):
+        # initialize server data structures
         self.net = HOAStryngS(serverPort)
         self.clientIDToUsername = dict()
         self.gameIDtoGame = dict()
@@ -34,10 +35,11 @@ class hangmanServer:
             self.scoreboard = list()
         #end init
 
+    # process a clients register request
     def __processRegister(self, clientID, RegisterRequest):
         username = RegisterRequest["Data"]
         # print for now - to check that everything is working
-        print(username)
+        print(username + " : " + str(clientID))
         
         # check if username is valid (size limit) + unique 
         if len(username) > 20:
@@ -59,11 +61,10 @@ class hangmanServer:
         #end __processRegister
 
 
+    # process a clients list games request
     def __processList(self, clientID):
-        print("got to processList")
-
+        # create a readable game list
         gameList = list()
-        #gameID, username1, username2
 
         for gameID in self.gameIDtoGame.keys():
             game = self.gameIDtoGame[gameID]
@@ -97,6 +98,7 @@ class hangmanServer:
         #end __createNewClientID
 
 
+    # process a clients create game request
     def __processCreate(self, clientID, RegisterRequest):
         if self.__alreadyInGame(clientID):
             self.net.sendDataToClient(clientID, "42", "Illegal Request")
@@ -123,9 +125,11 @@ class hangmanServer:
         #end __processCreate
 
 
+    # process a clients join game request
     def __processJoin(self, clientID, JoinRequest):
         gameID = int(JoinRequest["Data"])
 
+        # Phase 0: check if already in game 
         if self.__alreadyInGame(clientID):
             self.net.sendDataToClient(clientID, "42", "Illegal Request")
             return
@@ -135,7 +139,6 @@ class hangmanServer:
             self.net.sendDataToClient(clientID, "44", "Cannot Join Game")
             return
     
-        
         game = self.gameIDtoGame[gameID]
         #implicit guesser decision
         if game.getGuesser() is None:
@@ -153,11 +156,13 @@ class hangmanServer:
         #end __processJoin
 
 
+    # return true if a client is in a game already 
     def __alreadyInGame(self, clientID):
         return clientID in self.clientIDToGameID.keys()
         #end already in game
 
 
+    # process a clients exit game request
     def __processExit(self, clientID, ExitRequest):
         # Phase 0: check if gameID is none
         if clientID not in self.clientIDToGameID.keys():
@@ -191,6 +196,7 @@ class hangmanServer:
         #end __processList
 
 
+    # add a client to the scorebaord
     def __addClientsScoreToScoreboard(self, clientID):
         # creating dictionary with user's score 
         clientToScore = {
@@ -214,6 +220,7 @@ class hangmanServer:
         #end __addClientsScoreToScoreboard
 
 
+    # process a clients unregister request
     def __processUnregister(self, clientID, unregisterRequest):
         #Phase 1: check if in game
         if clientID in self.clientIDToGameID.keys():
@@ -236,6 +243,7 @@ class hangmanServer:
         #end __processList
 
 
+    # process a clients guess letter request
     def __processGuessLetter(self, clientID, guessLetterRequest):
         #check that the client is actually in a game
         if clientID not in self.clientIDToGameID.keys():
@@ -252,11 +260,11 @@ class hangmanServer:
         
         #check that the game has a word
         censoredWord = game.getCensoredWord()
-
         if censoredWord is None:
             self.net.sendDataToClient(clientID, "35", "Wait")
             return 
         
+        # letter can be guessed - have game do processing and return success
         guessedLetter = guessLetterRequest["Data"]
         game.processGuessLetter(guessedLetter)
 
@@ -265,6 +273,7 @@ class hangmanServer:
         #end __processList
     
 
+    # process a clients select request
     def __processSelectWord(self, clientID, selectWordRequest):
         # validate if they can select a word (not the guesser, game is not in progress)
         if clientID not in self.clientIDToGameID.keys():
@@ -293,12 +302,14 @@ class hangmanServer:
         #end __processSelectWord
 
 
+    # process a clients ask game state request
     def __processAskGameState(self, clientID, askGameStateRequest):        
         #check that the client is actually in a game
         if clientID not in self.clientIDToGameID.keys():
             self.net.sendDataToClient(clientID, "42", "Illegal Request")
             return
         
+        # get game state and send it
         gameID = self.clientIDToGameID[clientID]
         game = self.gameIDtoGame[gameID]
         info = game.getGameInfo(clientID)
@@ -307,6 +318,7 @@ class hangmanServer:
         #end __processAskGameState
 
 
+    # process a clients get score board request
     def __processGetScoreBoard(self, clientID, getScoreBoardRequest):
         # for now prob skip checking clientID (not necessary at all it seems)
         clientScore = self.clientIDtoWins[clientID]
@@ -319,11 +331,13 @@ class hangmanServer:
         #end __processGetScoreBoard
 
 
-
+    # main loop for server.
+    # 1) check for new client
+    # 2) process requests for all clients on the client list
+    # 3) repeat
     def server(self):
 
         while(True):
-
             #check for new client
             newClientID = self.net.pollForNewClientConnection()
             
@@ -333,10 +347,12 @@ class hangmanServer:
                 while (newRequest is None):
                     newRequest = self.net.pollClientForRequest(newClientID)
 
+                # register them with this server 
                 newRequestMethodType = newRequest["Method Type"]
                 if (newRequestMethodType == "REGI"):
                     self.__processRegister(newClientID, newRequest)
                 else:
+                    # if they don't register properly, then remove the connection
                     self.net.removeClient(newClientID)
 
 
@@ -350,7 +366,7 @@ class hangmanServer:
                     continue
                 
                 newRequestMethodType = newRequest["Method Type"]
-
+                print("Serving a " + str(newRequestMethodType) + " request for client " + str(clientID))
 
                 # call the approperiate processing helper method
                 # (register gets checked for above)
@@ -369,7 +385,7 @@ class hangmanServer:
                 elif(newRequestMethodType == "EXIT"):
                     self.__processExit(clientID, newRequest)
 
-                # game specific processing below
+                # game specific processing methods below
                 elif(newRequestMethodType == "SLWD"):
                     self.__processSelectWord(clientID, newRequest)
             
@@ -392,6 +408,7 @@ class hangmanServer:
 
   #end hangmanServer
 
+#run server
 def main():
     args = sys.argv[1:]
     serverPort = int(args[0])
@@ -399,5 +416,6 @@ def main():
     server.server()
     #endmain
     
+#run server
 if __name__ == "__main__":
     main()

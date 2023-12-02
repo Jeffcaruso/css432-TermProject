@@ -520,7 +520,7 @@ class hangmanClient:
 
 
     # prints the hangman display based on the number of 
-    # incorrect guesses     # Print the hangman based on how many wrong guesses you have made
+    # incorrect guesses 
     # from 0 - no hangman
     # To 6 - full hangman (lost games)
     def printHangmanDisplay(self, numIncorrectGuesses):
@@ -535,7 +535,7 @@ class hangmanClient:
         #end printHangmanDisplay
 
 
-    # get the scoreboard from the server and display the scoreboard    # display the scoreboard recieved from the server
+    # get the scoreboard from the server and display the scoreboard 
     # note, the users score is only saved to the SB once they unregister.
     def displayScoreboard(self):
         response = self.net.getScoreboard()
@@ -545,6 +545,7 @@ class hangmanClient:
         
         print("Your current number of wins: " + str(yourScore))
         print("NOTE: Your score is only saved to the scoreboard when you unregister from the game")
+        print()
         print("Current Scoreboard:")
         for score in scoreboard:
             print(score["username"].ljust(20) + "Wins: " + str(score["wins"]))        

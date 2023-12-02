@@ -40,7 +40,7 @@ class HOAStryngS:
 
     # send a packet though the correct conection socket
     def __sendToSocket(self, clientID, packet):
-        print("Sent message to: " + str(clientID))
+        # print("Sent message to: " + str(clientID))
         self.activeClientConnections[clientID].send(packet.encode())      
         #end of sendToSocket
 
